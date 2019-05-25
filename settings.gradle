@@ -1,1 +1,3 @@
-include ':app'
+include ':app', ':brick'
+
+project(':brick').projectDir = file('brick/main')
