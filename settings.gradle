@@ -3,10 +3,12 @@ include ':app',
         ':brick-strategy-okhttp3',
         ':brick-module-converter-gson',
         ':brick-module-converter-gson-okhttp3',
-        ':brick-module-task-rxjava2'
+        ':brick-module-task-rxjava2',
+        ':brick-module-task-rxjava'
 
 project(':brick').projectDir = file('brick/main')
 project(':brick-strategy-okhttp3').projectDir = file('brick/strategy/okhttp3')
 project(':brick-module-converter-gson').projectDir = file('brick/module/converter/gson')
 project(':brick-module-converter-gson-okhttp3').projectDir = file('brick/module/converter/gson-okhttp3')
 project(':brick-module-task-rxjava2').projectDir = file('brick/module/task/rxjava2')
+project(':brick-module-task-rxjava').projectDir = file('brick/module/task/rxjava')

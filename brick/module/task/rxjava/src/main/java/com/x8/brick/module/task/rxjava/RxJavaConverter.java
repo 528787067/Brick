@@ -1,4 +1,4 @@
-package com.x8.brick.module.task.rxjava2;
+package com.x8.brick.module.task.rxjava;
 
 import com.x8.brick.converter.TaskConverter;
 import com.x8.brick.parameter.Request;
@@ -8,32 +8,30 @@ import com.x8.brick.task.Task;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.Single;
+import rx.Completable;
+import rx.Observable;
+import rx.Observable.OnSubscribe;
+import rx.Scheduler;
+import rx.Single;
 
-public class RxJava2Converter implements TaskConverter<Task<? extends Request, ? extends Response, ?>, Object> {
+public class RxJavaConverter implements TaskConverter<Task<? extends Request, ? extends Response, ?>, Object> {
 
     private Scheduler scheduler;
     private boolean isAsync;
 
-    public RxJava2Converter() {
+    public RxJavaConverter() {
         this(null, false);
     }
 
-    public RxJava2Converter(boolean isAsync) {
+    public RxJavaConverter(boolean isAsync) {
         this(null, isAsync);
     }
 
-    public RxJava2Converter(Scheduler scheduler) {
+    public RxJavaConverter(Scheduler scheduler) {
         this(scheduler, false);
     }
 
-    public RxJava2Converter(Scheduler scheduler, boolean isAsync) {
+    public RxJavaConverter(Scheduler scheduler, boolean isAsync) {
         this.scheduler = scheduler;
         this.isAsync = isAsync;
     }
@@ -47,22 +45,17 @@ public class RxJava2Converter implements TaskConverter<Task<? extends Request, ?
         if (!(rawType instanceof Class)) {
             return null;
         }
-        Observable<?> observable = isAsync
-                ? new RxJava2TaskAsyncObservable<>(task) : new RxJava2TaskExecuteObservable<>(task);
+        OnSubscribe<?> onSubscribe = isAsync
+                ? new RxJavaTaskAsyncOnSubscribe<>(task) : new RxJavaTaskExecuteOnSubscribe<>(task);
+        Observable<?> observable = Observable.create(onSubscribe);
         if (scheduler != null) {
             observable = observable.subscribeOn(scheduler);
         }
-        if (rawType == Flowable.class) {
-            return observable.toFlowable(BackpressureStrategy.LATEST);
-        }
         if (rawType == Single.class) {
-            return observable.singleOrError();
-        }
-        if (rawType == Maybe.class) {
-            return observable.singleElement();
+            return observable.toSingle();
         }
         if (rawType == Completable.class) {
-            return observable.ignoreElements();
+            return observable.toCompletable();
         }
         if (rawType == Observable.class) {
             return observable;

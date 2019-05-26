@@ -22,4 +22,5 @@ dependencies {
     implementation project(path: ":brick")
     implementation project(path: ":brick-strategy-okhttp3")
     implementation project(path: ":brick-module-converter-gson-okhttp3")
+    implementation project(path: ":brick-module-task-rxjava2")
 }
