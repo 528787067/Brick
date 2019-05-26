@@ -4,8 +4,8 @@ sourceCompatibility = "${project.javaVersion}"
 targetCompatibility = "${project.javaVersion}"
 
 dependencies {
-    implementation project(path: ":brick-module-converter-gson")
+    implementation project(path: ":brick-converter-gson")
     compileOnly project(path: ":brick")
-    compileOnly project(path: ":brick-strategy-okhttp3")
+    compileOnly project(path: ":brick-okhttp3")
     compileOnly "com.android.support:support-annotations:${project.dependVersion.support_version}"
 }

@@ -20,7 +20,7 @@ android {
 dependencies {
     implementation "com.android.support:appcompat-v7:${project.dependVersion.support_version}"
     implementation project(path: ":brick")
-    implementation project(path: ":brick-strategy-okhttp3")
-    implementation project(path: ":brick-module-converter-gson-okhttp3")
-    implementation project(path: ":brick-module-task-rxjava2")
+    implementation project(path: ":brick-okhttp3")
+    implementation project(path: ":brick-okhttp3-converter-gson")
+    implementation project(path: ":brick-task-rxjava2")
 }

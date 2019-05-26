@@ -1,0 +1,8 @@
+apply plugin: 'java-library'
+
+sourceCompatibility = "${project.javaVersion}"
+targetCompatibility = "${project.javaVersion}"
+
+dependencies {
+    compileOnly project(path: ":brick-okhttp3")
+}
