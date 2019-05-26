@@ -4,7 +4,7 @@ sourceCompatibility = "7"
 targetCompatibility = "7"
 
 dependencies {
-    api "com.squareup.okhttp3:okhttp:${project.dependVersion.okhttp3}"
+    api "com.google.code.gson:gson:${project.dependVersion.gson}"
     compileOnly project(path: ":brick")
     compileOnly "com.android.support:support-annotations:${project.dependVersion.support_version}"
 }
