@@ -96,7 +96,7 @@ public abstract class TaskModel<REQUEST extends Request, RESPONSE extends Respon
             if (requestGenerator == null) {
                 throw new IllegalArgumentException("RequestGenerator cannot to be null.");
             }
-            request = requestGenerator.generateResponse(requestModel);
+            request = requestGenerator.generateRequest(requestModel);
         }
         return request;
     }
@@ -144,6 +144,6 @@ public abstract class TaskModel<REQUEST extends Request, RESPONSE extends Respon
     }
 
     public interface RequestGenerator<REQUEST extends Request> {
-        REQUEST generateResponse(RequestModel requestModel);
+        REQUEST generateRequest(RequestModel requestModel);
     }
 }

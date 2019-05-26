@@ -1,3 +1,4 @@
-include ':app', ':brick'
+include ':app', ':brick', ':brick-strategy-okhttp3'
 
 project(':brick').projectDir = file('brick/main')
+project(':brick-strategy-okhttp3').projectDir = file('brick/strategy/okhttp3')
