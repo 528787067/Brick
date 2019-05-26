@@ -1,7 +1,7 @@
 apply plugin: 'java-library'
 
-sourceCompatibility = "7"
-targetCompatibility = "7"
+sourceCompatibility = "${project.javaVersion}"
+targetCompatibility = "${project.javaVersion}"
 
 dependencies {
     implementation project(path: ":brick-module-converter-gson")

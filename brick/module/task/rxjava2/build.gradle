@@ -4,7 +4,6 @@ sourceCompatibility = "${project.javaVersion}"
 targetCompatibility = "${project.javaVersion}"
 
 dependencies {
-    api "com.google.code.gson:gson:${project.dependVersion.gson}"
+    api "io.reactivex.rxjava2:rxjava:${project.dependVersion.rxjava2}"
     compileOnly project(path: ":brick")
-    compileOnly "com.android.support:support-annotations:${project.dependVersion.support_version}"
 }
