@@ -2,15 +2,19 @@ include ':app',
         ':brick',
         ':brick-okhttp3',
         ':brick-okhttp3-converter-gson',
-        ':brick-converter-gson',
+        ':brick-okhttp3-executor-file',
+        ':brick-okhttp3-executor-android',
         ':brick-task-rxjava',
         ':brick-task-rxjava2',
-        ':brick-executor-file'
+        ':brick-converter-gson',
+        ':brick-executor-async'
 
 project(':brick').projectDir = file('brick/main')
 project(':brick-okhttp3').projectDir = file('brick/strategy/okhttp3')
 project(':brick-okhttp3-converter-gson').projectDir = file('brick/module/converter/gson-okhttp3')
+project(':brick-okhttp3-executor-file').projectDir = file('brick/module/executor/file')
+project(':brick-okhttp3-executor-android').projectDir = file('brick/module/executor/android')
 project(':brick-task-rxjava').projectDir = file('brick/module/task/rxjava')
 project(':brick-task-rxjava2').projectDir = file('brick/module/task/rxjava2')
 project(':brick-converter-gson').projectDir = file('brick/module/converter/gson')
-project(':brick-executor-file').projectDir = file('brick/module/executor/file')
+project(':brick-executor-async').projectDir = file('brick/module/executor/async')

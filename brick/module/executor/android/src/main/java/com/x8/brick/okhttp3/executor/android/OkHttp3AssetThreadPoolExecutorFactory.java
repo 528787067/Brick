@@ -1,5 +1,6 @@
-package com.x8.brick.okhttp3.executor.file;
+package com.x8.brick.okhttp3.executor.android;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.x8.brick.executor.Executor;
@@ -13,12 +14,17 @@ import java.util.concurrent.ExecutorService;
 
 import okhttp3.MediaType;
 
-public class OkHttp3FileThreadPoolExecutorFactory implements ExecutorFacotry<OkHttp3Request, OkHttp3Response> {
+public class OkHttp3AssetThreadPoolExecutorFactory implements ExecutorFacotry<OkHttp3Request, OkHttp3Response> {
 
+    private Context context;
     private String host;
     private String directoryMapper;
     private MediaType mediaType;
     private ExecutorService executorService;
+
+    public OkHttp3AssetThreadPoolExecutorFactory(@NonNull Context context) {
+        this.context = context;
+    }
 
     public void setHost(String host) {
         this.host = host;
@@ -47,48 +53,48 @@ public class OkHttp3FileThreadPoolExecutorFactory implements ExecutorFacotry<OkH
     @Override
     public <RESULT> Executor<OkHttp3Request, OkHttp3Response, RESULT> create(
             @NonNull TaskModel<OkHttp3Request, OkHttp3Response> taskModel) {
-        return new OkHttp3FileThreadPoolExecutor<>(host, directoryMapper, mediaType, executorService);
+        return new OkHttp3AssetThreadPoolExecutor<>(context, host, directoryMapper, mediaType, executorService);
     }
 
     public static class Builder {
 
-        private OkHttp3FileThreadPoolExecutorFactory executorFactory;
+        private OkHttp3AssetThreadPoolExecutorFactory executorFactory;
 
-        public Builder() {
-            executorFactory = new OkHttp3FileThreadPoolExecutorFactory();
+        public Builder(@NonNull Context context) {
+            executorFactory = new OkHttp3AssetThreadPoolExecutorFactory(context);
         }
 
-        public OkHttp3FileThreadPoolExecutorFactory.Builder setHost(String host) {
+        public OkHttp3AssetThreadPoolExecutorFactory.Builder setHost(String host) {
             executorFactory.setHost(host);
             return this;
         }
 
-        public OkHttp3FileThreadPoolExecutorFactory.Builder setHost(File host) {
+        public OkHttp3AssetThreadPoolExecutorFactory.Builder setHost(File host) {
             executorFactory.setHost(host);
             return this;
         }
 
-        public OkHttp3FileThreadPoolExecutorFactory.Builder setDirectoryMapper(String directoryMapper) {
+        public OkHttp3AssetThreadPoolExecutorFactory.Builder setDirectoryMapper(String directoryMapper) {
             executorFactory.setDirectoryMapper(directoryMapper);
             return this;
         }
 
-        public OkHttp3FileThreadPoolExecutorFactory.Builder setMediaType(String mediaType) {
+        public OkHttp3AssetThreadPoolExecutorFactory.Builder setMediaType(String mediaType) {
             executorFactory.setMediaType(mediaType);
             return this;
         }
 
-        public OkHttp3FileThreadPoolExecutorFactory.Builder setMediaType(MediaType mediaType) {
+        public OkHttp3AssetThreadPoolExecutorFactory.Builder setMediaType(MediaType mediaType) {
             executorFactory.setMediaType(mediaType);
             return this;
         }
 
-        public OkHttp3FileThreadPoolExecutorFactory.Builder setExecutorService(ExecutorService executorService) {
+        public OkHttp3AssetThreadPoolExecutorFactory.Builder setExecutorService(ExecutorService executorService) {
             executorFactory.setExecutorService(executorService);
             return this;
         }
 
-        public OkHttp3FileThreadPoolExecutorFactory build() {
+        public OkHttp3AssetThreadPoolExecutorFactory build() {
             return executorFactory;
         }
     }

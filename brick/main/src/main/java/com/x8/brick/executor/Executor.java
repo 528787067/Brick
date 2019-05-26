@@ -20,8 +20,8 @@ public interface Executor<REQUEST extends Request, RESPONSE extends Response, RE
     interface Callback<REQUEST extends Request, RESPONSE extends Response, RESULT> {
         REQUEST onRequest(Executor executor, REQUEST request);
         RESPONSE onExecute(Executor executor, REQUEST request,
-						   InterceptorChain.Executor<REQUEST, RESPONSE> interceptorExecutor
-		) throws HttpException;
+                InterceptorChain.Executor<REQUEST, RESPONSE> interceptorExecutor
+        ) throws HttpException;
         RESULT onResponse(Executor executor, RESPONSE response);
         void onSuccess(Executor executor, RESULT result);
         void onFailure(Executor executor, HttpException exception);

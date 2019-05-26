@@ -15,7 +15,7 @@ import okhttp3.MediaType;
 public class OkHttp3FileThreadExecutorFactory implements ExecutorFacotry<OkHttp3Request, OkHttp3Response> {
 
     private String host;
-    private String indexMapper;
+    private String directoryMapper;
     private MediaType mediaType;
 
     public void setHost(String host) {
@@ -26,8 +26,8 @@ public class OkHttp3FileThreadExecutorFactory implements ExecutorFacotry<OkHttp3
         setHost(host == null ? null : host.getAbsolutePath());
     }
 
-    public void setIndexMapper(String indexMapper) {
-        this.indexMapper = indexMapper;
+    public void setDirectoryMapper(String directoryMapper) {
+        this.directoryMapper = directoryMapper;
     }
 
     public void setMediaType(String mediaType) {
@@ -41,7 +41,7 @@ public class OkHttp3FileThreadExecutorFactory implements ExecutorFacotry<OkHttp3
     @Override
     public <RESULT> Executor<OkHttp3Request, OkHttp3Response, RESULT> create(
             @NonNull TaskModel<OkHttp3Request, OkHttp3Response> taskModel) {
-        return new OkHttp3FileThreadExecutor<>(host, indexMapper, mediaType);
+        return new OkHttp3FileThreadExecutor<>(host, directoryMapper, mediaType);
     }
 
     public static class Builder {
@@ -62,8 +62,8 @@ public class OkHttp3FileThreadExecutorFactory implements ExecutorFacotry<OkHttp3
             return this;
         }
 
-        public OkHttp3FileThreadExecutorFactory.Builder setIndexMapper(String indexMapper) {
-            executorFactory.setIndexMapper(indexMapper);
+        public OkHttp3FileThreadExecutorFactory.Builder setDirectoryMapper(String directoryMapper) {
+            executorFactory.setDirectoryMapper(directoryMapper);
             return this;
         }
 

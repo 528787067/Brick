@@ -1,9 +1,9 @@
 apply plugin: 'java-library'
 
-sourceCompatibility = "${project.javaVersion}"
-targetCompatibility = "${project.javaVersion}"
+sourceCompatibility = project.javaVersion
+targetCompatibility = project.javaVersion
 
 dependencies {
-    api "io.reactivex.rxjava2:rxjava:${project.dependVersion.rxjava2}"
+    implementation "io.reactivex.rxjava2:rxjava:${project.dependVersion.rxjava2}"
     compileOnly project(path: ":brick")
 }

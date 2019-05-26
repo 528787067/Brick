@@ -1,4 +1,7 @@
-package com.x8.brick.okhttp3.executor.file;
+package com.x8.brick.okhttp3.executor.android;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.x8.brick.okhttp3.OkHttp3Request;
 import com.x8.brick.okhttp3.OkHttp3Response;
@@ -9,14 +12,14 @@ import java.util.concurrent.Future;
 
 import okhttp3.MediaType;
 
-public class OkHttp3FileThreadPoolExecutor<T> extends OkHttp3FileExecutor<T> {
+public class OkHttp3AssetThreadPoolExecutor<T> extends OkHttp3AssetExecutor<T> {
 
     private ExecutorService executorService;
     private volatile Future<?> future;
 
-    public OkHttp3FileThreadPoolExecutor(String host, String directoryMapper,
-            MediaType mediaType, ExecutorService executorService) {
-        super(host, directoryMapper, mediaType);
+    public OkHttp3AssetThreadPoolExecutor( @NonNull Context context, String host,
+            String directoryMapper, MediaType mediaType, ExecutorService executorService) {
+        super(context, host, directoryMapper, mediaType);
         if (executorService == null) {
             executorService = Executors.newCachedThreadPool();
         }
@@ -24,12 +27,12 @@ public class OkHttp3FileThreadPoolExecutor<T> extends OkHttp3FileExecutor<T> {
     }
 
     @Override
-    public synchronized void asyncExecute(final OkHttp3Request request,
+    public void asyncExecute(final OkHttp3Request request,
             final Callback<OkHttp3Request, OkHttp3Response, T> callback) {
         if (future != null) {
             throw new IllegalStateException("Already Executed");
         }
-        future = executorService.submit(new Runnable() {
+        executorService.submit(new Runnable() {
             @Override
             public void run() {
                 onAsyncExecute(request, callback);

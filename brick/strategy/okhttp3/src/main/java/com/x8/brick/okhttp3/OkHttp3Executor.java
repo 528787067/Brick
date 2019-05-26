@@ -111,7 +111,7 @@ public class OkHttp3Executor<T> implements Executor<OkHttp3Request, OkHttp3Respo
             }
             Call call = executor.call();
             if (call == null) {
-                throw new IllegalStateException("Call is null");
+                throw new IllegalArgumentException("Call is null");
             }
             // noinspection unchecked
             call.enqueue(executors.put(call.request(), new Executor(executor, request, callback)));

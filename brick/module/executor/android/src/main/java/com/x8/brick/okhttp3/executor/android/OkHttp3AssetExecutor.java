@@ -1,4 +1,8 @@
-package com.x8.brick.okhttp3.executor.file;
+package com.x8.brick.okhttp3.executor.android;
+
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.support.annotation.NonNull;
 
 import com.x8.brick.exception.HttpException;
 import com.x8.brick.executor.Executor;
@@ -8,7 +12,6 @@ import com.x8.brick.okhttp3.OkHttp3Response;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,10 +25,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public abstract class OkHttp3FileExecutor<T> implements Executor<OkHttp3Request, OkHttp3Response, T> {
+public abstract class OkHttp3AssetExecutor<T> implements Executor<OkHttp3Request, OkHttp3Response, T> {
 
     private static final String DIRECTORY_MAPPER = "index";
     private static final String MEDIA_TYPE = "text/plain; charset=utf-8";
+
+    private Context context;
 
     private String host;
     private String directoryMapper;
@@ -34,7 +39,8 @@ public abstract class OkHttp3FileExecutor<T> implements Executor<OkHttp3Request,
     private volatile boolean isExcuted;
     private volatile boolean isCanceled;
 
-    public OkHttp3FileExecutor(String host, String directoryMapper, MediaType mediaType) {
+    public OkHttp3AssetExecutor(@NonNull Context context, String host, String directoryMapper, MediaType mediaType) {
+        this.context = context;
         if (host == null) {
             host = "";
         }
@@ -83,15 +89,17 @@ public abstract class OkHttp3FileExecutor<T> implements Executor<OkHttp3Request,
         InputStreamReader inputReader = null;
         BufferedReader bufferedReader = null;
         try {
-            File file = new File(pathBuilder.toString());
-            if (!file.exists()) {
-                throw new FileNotFoundException(file.getAbsolutePath());
+            String path = pathBuilder.toString();
+            AssetManager assetManager = context.getAssets();
+            String[] fileNames = assetManager.list(path);
+            if (fileNames == null) {
+                throw new FileNotFoundException(path);
             }
-            if (file.isDirectory() && !directoryMapper.isEmpty()) {
-                file = new File(file, directoryMapper);
+            if (fileNames.length > 0 && !directoryMapper.isEmpty()) {
+                path += File.separator + directoryMapper;
             }
             StringBuilder resultBuilder = new StringBuilder();
-            inputStream = new FileInputStream(file);
+            inputStream = assetManager.open(path);
             inputReader = new InputStreamReader(inputStream);
             bufferedReader = new BufferedReader(inputReader);
             while (true) {
@@ -170,7 +178,7 @@ public abstract class OkHttp3FileExecutor<T> implements Executor<OkHttp3Request,
                     new InterceptorChain.Executor<OkHttp3Request, OkHttp3Response>() {
                         @Override
                         public OkHttp3Response execute(OkHttp3Request request) throws HttpException {
-                            return OkHttp3FileExecutor.this.execute(okHttp3Request);
+                            return OkHttp3AssetExecutor.this.execute(okHttp3Request);
                         }
                     });
             T result = callback.onResponse(this, response);

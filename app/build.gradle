@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion project.compileSdkVersion
     defaultConfig {
-        applicationId "com.x8.brick"
-        minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        applicationId project.defaultConfig.applicationId
+        minSdkVersion project.defaultConfig.minSdkVersion
+        targetSdkVersion project.defaultConfig.targetSdkVersion
+        versionCode project.defaultConfig.versionCode
+        versionName project.defaultConfig.versionName
     }
     buildTypes {
         release {
@@ -18,9 +18,14 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:${project.dependVersion.support_version}"
     implementation project(path: ":brick")
     implementation project(path: ":brick-okhttp3")
     implementation project(path: ":brick-okhttp3-converter-gson")
+    implementation project(path: ":brick-okhttp3-executor-file")
+    implementation project(path: ":brick-okhttp3-executor-android")
+    implementation project(path: ":brick-task-rxjava")
     implementation project(path: ":brick-task-rxjava2")
+    implementation project(path: ":brick-converter-gson")
+    implementation project(path: ":brick-executor-async")
+    implementation "com.android.support:appcompat-v7:${project.dependVersion.support_version}"
 }

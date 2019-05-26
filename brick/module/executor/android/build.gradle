@@ -1,0 +1,18 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion project.compileSdkVersion
+    defaultConfig {
+        minSdkVersion project.defaultConfig.minSdkVersion
+        targetSdkVersion project.defaultConfig.targetSdkVersion
+    }
+}
+
+dependencies {
+    implementation project(path: ":brick-executor-async")
+    implementation project(path: ":brick-okhttp3-executor-file")
+    compileOnly project(path: ":brick")
+    compileOnly project(path: ":brick-okhttp3")
+    compileOnly "com.squareup.okhttp3:okhttp:${project.dependVersion.okhttp3}"
+    compileOnly "com.android.support:support-annotations:${project.dependVersion.support_version}"
+}

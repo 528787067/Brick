@@ -1,0 +1,14 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion project.compileSdkVersion
+    defaultConfig {
+        minSdkVersion project.defaultConfig.minSdkVersion
+        targetSdkVersion project.defaultConfig.targetSdkVersion
+    }
+}
+
+dependencies {
+    compileOnly project(path: ":brick")
+    compileOnly "com.android.support:support-annotations:${project.dependVersion.support_version}"
+}
