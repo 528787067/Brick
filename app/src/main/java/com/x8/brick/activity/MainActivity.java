@@ -7,7 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.x8.brick.R;
-import com.x8.brick.activity.basicusage.BasicUsageActivity;
+import com.x8.brick.activity.simple.SimpleActivity;
+import com.x8.brick.activity.multihost.MultiHostActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -15,14 +16,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        findViewById(R.id.basic_usage).setOnClickListener(this);
+        findViewById(R.id.simple).setOnClickListener(this);
+        findViewById(R.id.multi_host).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.basic_usage:
-                startActivity(new Intent(this, BasicUsageActivity.class));
+            case R.id.simple:
+                startActivity(new Intent(this, SimpleActivity.class));
+                break;
+            case R.id.multi_host:
+                startActivity(new Intent(this, MultiHostActivity.class));
                 break;
         }
     }

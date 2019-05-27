@@ -8,8 +8,14 @@
     tools:ignore="HardcodedText">
 
     <Button
-        android:id="@+id/basic_usage"
+        android:id="@+id/simple"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="基本使用" />
+
+    <Button
+        android:id="@+id/multi_host"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="多环境切换"/>
 </LinearLayout>

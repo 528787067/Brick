@@ -1,4 +1,4 @@
-package com.x8.brick.activity.basicusage;
+package com.x8.brick.activity.simple;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,29 +13,27 @@ import com.x8.brick.okhttp3.OkHttp3Manager;
 import com.x8.brick.okhttp3.OkHttp3Task;
 import com.x8.brick.task.Task;
 
-import java.io.IOException;
-
 import okhttp3.Response;
 
-public class BasicUsageActivity extends AppCompatActivity implements View.OnClickListener, Task.Callback<Response> {
+public class SimpleActivity extends AppCompatActivity implements View.OnClickListener, Task.Callback<Response> {
 
-    private BasicUsageApi api;
+    private SimpleApi api;
     private TextView dataView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.base_usage_activity);
+        setContentView(R.layout.simple_activity);
         setTitle("基本使用");
 
         findViewById(R.id.path_user).setOnClickListener(this);
         findViewById(R.id.get_user).setOnClickListener(this);
         findViewById(R.id.post_user).setOnClickListener(this);
-        dataView = (TextView) findViewById(R.id.data);
+        dataView = (TextView) findViewById(R.id.data_show);
 
         OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
         OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client).build();
-        api = http3Manager.create(BasicUsageApi.class);
+        api = http3Manager.create(SimpleApi.class);
     }
 
     @Override

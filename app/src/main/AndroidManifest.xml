@@ -16,6 +16,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.basicusage.BasicUsageActivity"/>
+        <activity android:name=".activity.simple.SimpleActivity"/>
+        <activity android:name=".activity.multihost.MultiHostActivity"/>
     </application>
 </manifest>

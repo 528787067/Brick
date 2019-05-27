@@ -1,4 +1,4 @@
-package com.x8.brick.activity.basicusage;
+package com.x8.brick.activity.simple;
 
 import com.x8.brick.annotation.define.method.FormUrlEncoded;
 import com.x8.brick.annotation.define.method.GET;
@@ -12,7 +12,7 @@ import com.x8.brick.okhttp3.OkHttp3Task;
 import okhttp3.Response;
 
 @Api("http:192.168.31.100:8080/brick/user/")
-public interface BasicUsageApi {
+public interface SimpleApi {
 
     @GET("{path}")
     OkHttp3Task<Response> pathUser(@Path("path") String path);
