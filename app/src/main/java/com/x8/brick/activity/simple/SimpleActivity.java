@@ -13,6 +13,9 @@ import com.x8.brick.okhttp3.OkHttp3Manager;
 import com.x8.brick.okhttp3.OkHttp3Task;
 import com.x8.brick.task.Task;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 public class SimpleActivity extends AppCompatActivity implements View.OnClickListener, Task.Callback<Response> {
@@ -31,7 +34,13 @@ public class SimpleActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.post_user).setOnClickListener(this);
         dataView = (TextView) findViewById(R.id.data_show);
 
-        OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .readTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
+                .build();
+        OkHttp3Client http3Client = new OkHttp3Client.Builder()
+                .setOkHttpClient(httpClient)
+                .build();
         OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client).build();
         api = http3Manager.create(SimpleApi.class);
     }

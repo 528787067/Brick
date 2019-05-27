@@ -18,5 +18,6 @@
         </activity>
         <activity android:name=".activity.simple.SimpleActivity"/>
         <activity android:name=".activity.multihost.MultiHostActivity"/>
+        <activity android:name=".activity.interceptor.InterceptorActivity"/>
     </application>
 </manifest>

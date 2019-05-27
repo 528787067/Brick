@@ -4,14 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp"
     tools:ignore="HardcodedText">
-
-    <Button
-        android:id="@+id/path_user"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="PATH" />
 
     <Button
         android:id="@+id/get_user"
@@ -31,5 +24,4 @@
         android:layout_height="match_parent"
         android:layout_marginTop="20dp"
         android:text="数据展示" />
-
 </LinearLayout>
