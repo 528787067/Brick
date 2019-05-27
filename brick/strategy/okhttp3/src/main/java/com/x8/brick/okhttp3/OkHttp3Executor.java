@@ -4,10 +4,13 @@ import android.support.annotation.NonNull;
 
 import com.x8.brick.exception.HttpException;
 import com.x8.brick.executor.Executor;
+import com.x8.brick.interceptor.InterceptorChain;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import okhttp3.Interceptor;
@@ -21,9 +24,18 @@ public class OkHttp3Executor<T> implements Executor<OkHttp3Request, OkHttp3Respo
 
     private OkHttpClient okHttpClient;
     private Call call;
+    private AsyncExecutor<T> executor;
 
     public OkHttp3Executor(@NonNull OkHttpClient httpClient) {
+        this(httpClient, null);
+    }
+
+    public OkHttp3Executor(@NonNull OkHttpClient httpClient, AsyncExecutor<T> executor) {
+        if (executor == null) {
+            executor = new ThreadPoolExecutor<>(httpClient.dispatcher().executorService());
+        }
         this.okHttpClient = httpClient;
+        this.executor = executor;
     }
 
     public Call call() {
@@ -46,8 +58,7 @@ public class OkHttp3Executor<T> implements Executor<OkHttp3Request, OkHttp3Respo
 
     @Override
     public void asyncExecute(OkHttp3Request request, Callback<OkHttp3Request, OkHttp3Response, T> callback) {
-        makeCall(request);
-        ExecutorInterceptor.instance.enqueue(this, request, callback);
+        executor.asyncExecute(this, request, callback);
     }
 
     @Override
@@ -64,7 +75,7 @@ public class OkHttp3Executor<T> implements Executor<OkHttp3Request, OkHttp3Respo
 
     @Override
     public boolean isCanceled() {
-        return call == null || call.isCanceled();
+        return call != null && call.isCanceled();
     }
 
     private synchronized void makeCall(OkHttp3Request request) {
@@ -90,31 +101,107 @@ public class OkHttp3Executor<T> implements Executor<OkHttp3Request, OkHttp3Respo
         return response;
     }
 
-    public static class ExecutorInterceptor implements Interceptor {
+    public interface AsyncExecutor<T> {
+        void asyncExecute(OkHttp3Executor<T> executor, OkHttp3Request request,
+                Callback<OkHttp3Request, OkHttp3Response, T> callback);
+    }
 
-        private static ExecutorInterceptor instance = new ExecutorInterceptor();
+    public abstract static class AsyncExecutorStrategy<T> implements AsyncExecutor<T> {
+        protected void onAsyncExecute(final OkHttp3Executor<T> executor, final OkHttp3Request okHttp3Request,
+                Callback<OkHttp3Request, OkHttp3Response, T> callback) {
+            if (callback == null) {
+                try {
+                    executor.execute(okHttp3Request);
+                } catch (HttpException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+            try {
+                OkHttp3Request request = callback.onRequest(executor, okHttp3Request);
+                OkHttp3Response response = callback.onExecute(executor, request,
+                        new InterceptorChain.Executor<OkHttp3Request, OkHttp3Response>() {
+                            @Override
+                            public OkHttp3Response execute(OkHttp3Request request) throws HttpException {
+                                return executor.execute(okHttp3Request);
+                            }
+                        });
+                T result = callback.onResponse(executor, response);
+                callback.onSuccess(executor, result);
+            } catch (HttpException e) {
+                callback.onFailure(executor, e);
+            }
+        }
+    }
 
-        public static ExecutorInterceptor getInstance() {
+    public static class ThreadExecutor<T> extends AsyncExecutorStrategy<T> {
+        @Override
+        public void asyncExecute(final OkHttp3Executor<T> executor, final OkHttp3Request request,
+                final Callback<OkHttp3Request, OkHttp3Response, T> callback) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    onAsyncExecute(executor, request, callback);
+                }
+            }).start();
+        }
+    }
+
+    public static class ThreadPoolExecutor<T> extends AsyncExecutorStrategy<T> {
+
+        private ExecutorService executorService;
+
+        public ThreadPoolExecutor() {
+            this(null);
+        }
+
+        public ThreadPoolExecutor(ExecutorService executorService) {
+            if (executorService == null) {
+                executorService = Executors.newCachedThreadPool();
+            }
+            this.executorService = executorService;
+        }
+
+        @Override
+        public void asyncExecute(final OkHttp3Executor<T> executor, final OkHttp3Request request,
+                final Callback<OkHttp3Request, OkHttp3Response, T> callback) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    onAsyncExecute(executor, request, callback);
+                }
+            });
+        }
+    }
+
+    public static class InterceptorExecutor<T> implements AsyncExecutor<T>, Interceptor {
+
+        private static InterceptorExecutor instance = new InterceptorExecutor();
+
+        public static InterceptorExecutor getInstance() {
             return instance;
         }
 
         private Map<Request, Executor> executors;
 
-        private ExecutorInterceptor() {
+        private InterceptorExecutor() {
             executors = new ConcurrentHashMap<>();
         }
 
-        public void enqueue(OkHttp3Executor<?> executor, OkHttp3Request request,
-                            final Callback<OkHttp3Request, OkHttp3Response, ?> callback) {
+        @Override
+        public void asyncExecute(OkHttp3Executor<T> executor, OkHttp3Request request,
+                Callback<OkHttp3Request, OkHttp3Response, T> callback) {
             if (executor == null) {
-                throw new IllegalStateException("Executor is null");
+                throw new IllegalArgumentException("Executor is null");
             }
+            executor.makeCall(request);
             Call call = executor.call();
             if (call == null) {
                 throw new IllegalArgumentException("Call is null");
             }
-            // noinspection unchecked
-            call.enqueue(executors.put(call.request(), new Executor(executor, request, callback)));
+            Executor<?> executorCallback = new Executor<>(executor, request, callback);
+            executors.put(call.request(), executorCallback);
+            call.enqueue(executorCallback);
         }
 
         @Override
@@ -131,9 +218,9 @@ public class OkHttp3Executor<T> implements Executor<OkHttp3Request, OkHttp3Respo
             }
             if (response == null) {
                 response = chain.proceed(request);
-            }
-            if (!streaming) {
-                response = bufferResponse(response);
+                if (!streaming) {
+                    response = bufferResponse(response);
+                }
             }
             return response;
         }
@@ -153,11 +240,15 @@ public class OkHttp3Executor<T> implements Executor<OkHttp3Request, OkHttp3Respo
                 this.callback = callback;
             }
 
-            public Response intercept(Chain chain) throws IOException {
+            Response intercept(Chain chain) throws IOException {
                 if (callback != null) {
                     request = callback.onRequest(executor, request);
                 }
-                response = new OkHttp3Response(chain.proceed(request.request));
+                okhttp3.Response rawResponse = chain.proceed(request.request);
+                if (!request.streaming) {
+                    rawResponse = bufferResponse(rawResponse);
+                }
+                response = new OkHttp3Response(rawResponse);
                 if (callback != null) {
                     result = callback.onResponse(executor, response);
                 }

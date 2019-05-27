@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.Objects;
 
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -50,9 +49,8 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
         new ParameterHandler.MethodPath().apply(this, requestModel);
         new ParameterHandler.BaseUrl(httpManager).apply(this, requestModel);
         new ParameterHandler.RelativeUrl().apply(this, requestModel);
-        new ParameterHandler.UrlBuilder(baseUrl, relativeUrl).apply(this, requestModel);
         new ParameterHandler.Path(relativeUrl).apply(this, requestModel);
-        new ParameterHandler.Query(urlBuilder).apply(this, requestModel);
+        new ParameterHandler.Query(baseUrl, relativeUrl).apply(this, requestModel);
         new ParameterHandler.MediaType().apply(this, requestModel);
         new ParameterHandler.Header(requestBuilder).apply(this, requestModel);
         new ParameterHandler.Body().apply(this, requestModel);
@@ -140,7 +138,7 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
                 String baseUrl = null;
                 if (httpManager.hosts() != null) {
                     for (RequestModel.Host host : httpManager.hosts()) {
-                        if (Objects.equals(hostName, host.name)) {
+                        if (hostName.equals(host.name)) {
                             baseUrl = host.url;
                             break;
                         }
@@ -148,7 +146,7 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
                 }
                 if (baseUrl == null) {
                     for (RequestModel.Host host : requestModel.hosts()) {
-                        if (Objects.equals(hostName, host.name)) {
+                        if (hostName.equals(host.name)) {
                             baseUrl = host.url;
                             break;
                         }
@@ -175,7 +173,7 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
         static final class RelativeUrl extends ParameterHandler {
             @Override
             void apply(@NonNull OkHttp3RequestGenerator builder, @NonNull RequestModel requestModel) {
-                builder.relativeUrl = requestModel.urls().size() > 0
+                builder.relativeUrl = requestModel.hasUrl()
                         ? requestModel.urls().get(0) : requestModel.methodPaths().get(0).path;
             }
         }
@@ -228,19 +226,25 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
 
         static final class Query extends ParameterHandler {
 
-            private HttpUrl.Builder urlBuilder;
+            private HttpUrl baseUrl;
+            private String relativeUrl;
 
-            Query(HttpUrl.Builder urlBuilder) {
-                this.urlBuilder = urlBuilder;
+            Query(HttpUrl baseUrl, String relativeUrl) {
+                this.baseUrl = baseUrl;
+                this.relativeUrl = relativeUrl;
             }
 
             @Override
             void apply(@NonNull OkHttp3RequestGenerator builder, @NonNull RequestModel requestModel) {
-                for (RequestModel.Query query : requestModel.querys()) {
-                    if (query.encoded) {
-                        urlBuilder.addEncodedQueryParameter(query.name, query.value);
-                    } else {
-                        urlBuilder.addQueryParameter(query.name, query.value);
+                if (requestModel.hasQuery()) {
+                    new UrlBuilder(baseUrl, relativeUrl).apply(builder, requestModel);
+                    HttpUrl.Builder urlBuilder = builder.urlBuilder;
+                    for (RequestModel.Query query : requestModel.querys()) {
+                        if (query.encoded) {
+                            urlBuilder.addEncodedQueryParameter(query.name, query.value);
+                        } else {
+                            urlBuilder.addQueryParameter(query.name, query.value);
+                        }
                     }
                 }
             }
@@ -277,7 +281,7 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
         static final class Body extends ParameterHandler {
             @Override
             void apply(@NonNull OkHttp3RequestGenerator builder, @NonNull RequestModel requestModel) {
-                if (requestModel.bodys().size() > 0) {
+                if (requestModel.hasBody()) {
                     builder.body = (RequestBody) requestModel.bodys().get(0);
                 }
             }
@@ -310,7 +314,7 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
         static final class Multipart extends ParameterHandler {
             @Override
             void apply(@NonNull OkHttp3RequestGenerator builder, @NonNull RequestModel requestModel) {
-                builder.isMultipart = requestModel.multiparts().size() > 0;
+                builder.isMultipart = requestModel.isMultipart();
             }
         }
 
@@ -344,14 +348,14 @@ final class OkHttp3RequestGenerator implements TaskModel.RequestGenerator<OkHttp
         static final class FormEncoded extends ParameterHandler {
             @Override
             void apply(@NonNull OkHttp3RequestGenerator builder, @NonNull RequestModel requestModel) {
-                builder.isFormEncoded = requestModel.formUrlEncodeds().size() > 0;
+                builder.isFormEncoded = requestModel.isFormEncoded();
             }
         }
 
         static final class Streaming extends ParameterHandler {
             @Override
             void apply(@NonNull OkHttp3RequestGenerator builder, @NonNull RequestModel requestModel) {
-                builder.streaming = requestModel.streamings().size() > 0;
+                builder.streaming = requestModel.isStreaming();
             }
         }
     }

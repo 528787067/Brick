@@ -27,9 +27,9 @@ public class OkHttp3TaskModel extends TaskModel<OkHttp3Request, OkHttp3Response>
     @Override
     public Type responseType() {
         Type type = super.responseType();
-        if (type == OkHttp3Response.class || type == Response.class) {
+        if (type == OkHttp3Response.class) {
             throw new IllegalArgumentException(
-                    "'" + type + "' is not a valid response body type. Did you mean ResponseBody?");
+                    "'" + type + "' is not a valid response body type. Did you mean Response?");
         }
         return type;
     }

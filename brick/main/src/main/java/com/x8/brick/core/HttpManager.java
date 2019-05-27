@@ -153,6 +153,10 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
         return parameterAnnotationHandlerDelegate;
     }
 
+    public void setHost(String host) {
+        setHostName(host);
+    }
+
     protected void setHostName(String hostName) {
         this.hostName = hostName;
     }
@@ -270,6 +274,10 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
         public BUILDER setBaseUrl(String baseUrl) {
             httpManager.setBaseUrl(baseUrl);
             return builder();
+        }
+
+        public BUILDER setHost(String host) {
+            return setHostName(host);
         }
 
         public BUILDER setHostName(String hostName) {

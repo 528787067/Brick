@@ -14,22 +14,43 @@ import okhttp3.OkHttpClient;
 public class OkHttp3ExecutorFactory implements ExecutorFacotry<OkHttp3Request, OkHttp3Response> {
 
     private OkHttpClient httpClient;
+    private OkHttp3Executor.AsyncExecutor asyncExecutor;
 
     public OkHttp3ExecutorFactory() {
-        this(new OkHttpClient.Builder().build());
+        this(null, false);
     }
 
-    public OkHttp3ExecutorFactory(@NonNull OkHttpClient httpClient) {
+    public OkHttp3ExecutorFactory(OkHttpClient httpClient) {
+        this(httpClient, false);
+    }
+
+    public OkHttp3ExecutorFactory(boolean okhttpEnqueueStrategy) {
+        this(null, false);
+    }
+
+    public OkHttp3ExecutorFactory(OkHttpClient httpClient, boolean okhttpEnqueueStrategy) {
+        if (httpClient == null) {
+            httpClient = new OkHttpClient.Builder().build();
+        }
+        if (okhttpEnqueueStrategy) {
+            List<Interceptor> interceptors = httpClient.interceptors();
+            OkHttp3Executor.InterceptorExecutor executorInterceptor = OkHttp3Executor.InterceptorExecutor.getInstance();
+            if (!interceptors.contains(executorInterceptor)) {
+                httpClient = httpClient.newBuilder()
+                        .addInterceptor(executorInterceptor)
+                        .build();
+            }
+            this.asyncExecutor = OkHttp3Executor.InterceptorExecutor.getInstance();
+        } else {
+            this.asyncExecutor = new OkHttp3Executor.ThreadPoolExecutor<>(httpClient.dispatcher().executorService());
+        }
         this.httpClient = httpClient;
-        List<Interceptor> interceptors = this.httpClient.interceptors();
-        OkHttp3Executor.ExecutorInterceptor interceptor = OkHttp3Executor.ExecutorInterceptor.getInstance();
-        interceptors.remove(interceptor);
-        interceptors.add(0, interceptor);
     }
 
     @Override
     public <RESULT> Executor<OkHttp3Request, OkHttp3Response, RESULT> create(
             @NonNull TaskModel<OkHttp3Request, OkHttp3Response> taskModel) {
-        return new OkHttp3Executor<>(httpClient);
+        // noinspection unchecked
+        return new OkHttp3Executor<>(httpClient, asyncExecutor);
     }
 }

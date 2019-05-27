@@ -10,15 +10,21 @@ import com.x8.brick.interceptor.Interceptor;
 import java.io.IOException;
 
 import okhttp3.Connection;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class OkHttp3Client extends HttpClient<OkHttp3Request, OkHttp3Response> {
 
-    private okhttp3.OkHttpClient okHttpClient;
+    private OkHttpClient okHttpClient;
+    private boolean okhttpEnqueueStrategy;
 
-    void setOkHttpClient(@NonNull okhttp3.OkHttpClient okHttpClient) {
+    void setOkHttpClient(@NonNull OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
+    }
+
+    void setOkhttpEnqueueStrategy(boolean okhttpEnqueueStrategy) {
+        this.okhttpEnqueueStrategy = okhttpEnqueueStrategy;
     }
 
     void addOkHttpIntercptor(@NonNull final okhttp3.Interceptor interceptor) {
@@ -58,8 +64,12 @@ public class OkHttp3Client extends HttpClient<OkHttp3Request, OkHttp3Response> {
         });
     }
 
-    public okhttp3.OkHttpClient okHttpClient() {
+    public OkHttpClient okHttpClient() {
         return okHttpClient;
+    }
+
+    public boolean okhttpEnqueueStrategy() {
+        return okhttpEnqueueStrategy;
     }
 
     public static class Builder extends HttpClient.Builder<OkHttp3Request, OkHttp3Response, OkHttp3Client, Builder> {
@@ -77,8 +87,13 @@ public class OkHttp3Client extends HttpClient<OkHttp3Request, OkHttp3Response> {
             return new OkHttp3Client();
         }
 
-        public Builder setOkHttpClient(@NonNull okhttp3.OkHttpClient okHttpClient) {
+        public Builder setOkHttpClient(@NonNull OkHttpClient okHttpClient) {
             httpClient().setOkHttpClient(okHttpClient);
+            return this;
+        }
+
+        public Builder setOkhttpEnqueueStrategy(boolean okhttpEnqueueStrategy) {
+            httpClient().setOkhttpEnqueueStrategy(okhttpEnqueueStrategy);
             return this;
         }
 
@@ -91,12 +106,9 @@ public class OkHttp3Client extends HttpClient<OkHttp3Request, OkHttp3Response> {
         public OkHttp3Client build() {
             OkHttp3Client httpClient = httpClient();
             if (httpClient.executorFacotry() == null) {
-                okhttp3.OkHttpClient okHttpClient = httpClient.okHttpClient();
-                if (okHttpClient != null) {
-                    setExecutorFacotry(new OkHttp3ExecutorFactory(okHttpClient));
-                } else {
-                    setExecutorFacotry(new OkHttp3ExecutorFactory());
-                }
+                ExecutorFacotry<OkHttp3Request, OkHttp3Response> executorFacotry = new OkHttp3ExecutorFactory(
+                        httpClient.okHttpClient(), httpClient.okhttpEnqueueStrategy());
+                setExecutorFacotry(executorFacotry);
             }
             if (httpClient.taskFactory() == null) {
                 setTaskFactory(new OkHttp3TaskFactory());

@@ -4,8 +4,6 @@ sourceCompatibility = project.javaVersion
 targetCompatibility = project.javaVersion
 
 dependencies {
-    compileOnly project(path: ":brick")
     compileOnly project(path: ":brick-okhttp3")
-    compileOnly "com.squareup.okhttp3:okhttp:${project.dependVersion.okhttp3}"
     compileOnly "com.android.support:support-annotations:${project.dependVersion.support_version}"
 }

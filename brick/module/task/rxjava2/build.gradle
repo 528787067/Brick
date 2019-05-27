@@ -4,6 +4,6 @@ sourceCompatibility = project.javaVersion
 targetCompatibility = project.javaVersion
 
 dependencies {
-    implementation "io.reactivex.rxjava2:rxjava:${project.dependVersion.rxjava2}"
     compileOnly project(path: ":brick")
+    api "io.reactivex.rxjava2:rxjava:${project.dependVersion.rxjava2}"
 }

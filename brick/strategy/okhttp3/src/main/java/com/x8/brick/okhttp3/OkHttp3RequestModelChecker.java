@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +32,7 @@ public class OkHttp3RequestModelChecker implements TaskModel.RequestModelChecker
             Map<String, String> hosts = new HashMap<>();
             for (RequestModel.Host host : requestModel.hosts()) {
                 String url = hosts.get(host.name);
-                if (url != null && !Objects.equals(url, host.url)) {
+                if (url != null && !url.equals(host.url)) {
                     throw new IllegalArgumentException(
                             "It is not allowed to define different URLs with the same host name.");
                 }
