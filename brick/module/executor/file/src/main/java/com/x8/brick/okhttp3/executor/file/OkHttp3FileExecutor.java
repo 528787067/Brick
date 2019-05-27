@@ -25,7 +25,7 @@ import okhttp3.ResponseBody;
 public abstract class OkHttp3FileExecutor<T> implements Executor<OkHttp3Request, OkHttp3Response, T> {
 
     private static final String DIRECTORY_MAPPER = "index";
-    private static final String MEDIA_TYPE = "text/plain; charset=utf-8";
+    private static final String MEDIA_TYPE = "text/plain; charset=UTF-8";
 
     private String host;
     private String directoryMapper;

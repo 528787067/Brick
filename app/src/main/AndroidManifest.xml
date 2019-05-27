@@ -19,5 +19,6 @@
         <activity android:name=".activity.simple.SimpleActivity"/>
         <activity android:name=".activity.multihost.MultiHostActivity"/>
         <activity android:name=".activity.interceptor.InterceptorActivity"/>
+        <activity android:name=".activity.gson.GsonActivity"/>
     </application>
 </manifest>

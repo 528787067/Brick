@@ -28,5 +28,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="过滤器/拦截器" />
+
+        <Button
+            android:id="@+id/gson"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gson转换器" />
     </LinearLayout>
 </ScrollView>
