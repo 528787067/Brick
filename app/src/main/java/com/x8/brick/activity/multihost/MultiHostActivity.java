@@ -23,6 +23,7 @@ public class MultiHostActivity extends AppCompatActivity implements CompoundButt
 
     private OkHttp3Manager httpManager;
     private MultiHostApi api;
+
     private TextView dataView;
 
     @Override
@@ -30,10 +31,6 @@ public class MultiHostActivity extends AppCompatActivity implements CompoundButt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.multi_host_activity);
         setTitle("多环境切换");
-
-        OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
-        httpManager = new OkHttp3Manager.Builder(http3Client).build();
-        api = httpManager.create(MultiHostApi.class);
 
         ((RadioButton) findViewById(R.id.online)).setOnCheckedChangeListener(this);
         ((RadioButton) findViewById(R.id.sandbox)).setOnCheckedChangeListener(this);
@@ -44,6 +41,11 @@ public class MultiHostActivity extends AppCompatActivity implements CompoundButt
         findViewById(R.id.post_data).setOnClickListener(this);
 
         dataView = (TextView) findViewById(R.id.data_show);
+
+        // 构造网络请求对象
+        OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
+        httpManager = new OkHttp3Manager.Builder(http3Client).build();
+        api = httpManager.create(MultiHostApi.class);
     }
 
     @Override
@@ -51,6 +53,10 @@ public class MultiHostActivity extends AppCompatActivity implements CompoundButt
         if (!checked) {
             return;
         }
+        /*
+         * 使用 httpManager 的 setHost 方法切换环境（对应的 host 需要有在 API 接口中配置或者在 java 代码中设置过）
+         * 如果在 java 代码中设置过和 API 接口中配置一样的 host，则会优先使用 Java 代码中设置的 host
+         */
         switch (compoundButton.getId()) {
             case R.id.online:
                 httpManager.setHost("online");

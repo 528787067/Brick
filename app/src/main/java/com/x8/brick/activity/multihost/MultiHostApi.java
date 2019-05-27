@@ -9,6 +9,12 @@ import com.x8.brick.okhttp3.OkHttp3Task;
 
 import okhttp3.Response;
 
+/**
+ * 网络请求接口需要使用 @Api 注解进行修饰
+ * {@param hostName} 用于配置当前默认使用的环境名称
+ * Api 注解中默认预设了 8 个常用的 host 可供直接使用
+ * 如果预设的 host 无法满足需求，则可使用 {@param hosts} 配置自定义的 host，具体 host 定义规则： "hostName@url"
+ */
 @Api(
         hostName = "online",
         online = "http:192.168.31.100:8080/brick/online/",

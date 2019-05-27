@@ -14,19 +14,23 @@ import com.x8.brick.activity.gson.UserBean;
 import com.x8.brick.exception.HttpException;
 import com.x8.brick.okhttp3.OkHttp3Client;
 import com.x8.brick.okhttp3.OkHttp3Manager;
+import com.x8.brick.okhttp3.OkHttp3Task;
 import com.x8.brick.okhttp3.converter.gson.OkHttp3GsonResponseConverter;
 import com.x8.brick.task.Task;
 import com.x8.brick.task.rxjava2.RxJava2Converter;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Callback;
+import okhttp3.Dispatcher;
 
 import com.x8.brick.activity.task.AsyncTaskConverter.AsyncTask;
 
-public class TaskActivity extends AppCompatActivity {
+public class TaskActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private TaskApi taskApi;
 
     private TextView timestamp;
     private TextView name;
@@ -39,52 +43,106 @@ public class TaskActivity extends AppCompatActivity {
         setTitle("自定义Task转换器");
         setContentView(R.layout.task_activity);
 
-        timestamp = (TextView) findViewById(R.id.timestamp);
-        name = (TextView) findViewById(R.id.name);
-        age = (TextView) findViewById(R.id.age);
-        method = (TextView) findViewById(R.id.method);
+        this.timestamp = (TextView) findViewById(R.id.timestamp);
+        this.name = (TextView) findViewById(R.id.name);
+        this.age = (TextView) findViewById(R.id.age);
+        this.method = (TextView) findViewById(R.id.method);
 
-        OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
-        OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client)
-                .addResponseConverter(new OkHttp3GsonResponseConverter<>())
-                .addTaskConverter(new AsyncTaskConverter())
-                .addTaskConverter(new RxJava2Converter())
+        findViewById(R.id.get_user).setOnClickListener(this);
+        findViewById(R.id.rxjava2).setOnClickListener(this);
+        findViewById(R.id.async_task).setOnClickListener(this);
+
+        OkHttp3Client http3Client = new OkHttp3Client.Builder()
+                .setOkhttpEnqueueStrategy(false) // 不使用 okhttp 的 enqueue 作为异步策略
                 .build();
-        final TaskApi api = http3Manager.create(TaskApi.class);
+        OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client)
+                .addResponseConverter(new OkHttp3GsonResponseConverter<>()) // 指定使用 Gson 转换器将响应转换成实体对象
+                .addTaskConverter(new AsyncTaskConverter()) // 指定 AsyncTaskConverter 转换器将 Task 转换成 AsyncTask
+                .addTaskConverter(new RxJava2Converter()) // 指定 RxJava2Converter 转换器将 Task 转换成 Observable
+                .build();
+        this.taskApi = http3Manager.create(TaskApi.class);
+    }
 
-        findViewById(R.id.rxjava2).setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.get_user:
+                getRequest();       // 执行默认网络请求
+                break;
+            case R.id.rxjava2:
+                rxjava2Request();   // 使用 RxJava2 执行网络请求
+                break;
+            case R.id.async_task:
+                asyncTaskRequest(); // 使用 AsyncTask 执行网络请求
+                break;
+        }
+    }
+
+    /**
+     * 使用默认的 {@link OkHttp3Task} 执行网络请求
+     * 默认使用的是 OkHttp 线程池执行网络请求 {@link Dispatcher#executorService()}
+     * 构建 {@link OkHttp3Client} 的时候可以使用 {@link OkHttp3Client.Builder#okhttpEnqueueStrategy()}
+     * 设置是否使用 {@link okhttp3.Call#enqueue(Callback)} 方法作为异步策略，默认为 {@param false}
+     * 注意：此回调不在 UI 线程，更新 UI 需要切换到 UI 线程进行更新
+     */
+    private void getRequest() {
+        OkHttp3Task<ResponseBean<UserBean>> task = taskApi.getUser("江小白", 15);
+        task.asyncExecute(new Task.Callback<ResponseBean<UserBean>>() {
             @Override
-            public void onClick(View view) {
-                Observable<ResponseBean<UserBean>> getObservable = api.rxUser("李小二", 18);
-                Disposable getDisposable = getObservable.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<ResponseBean<UserBean>>() {
-                            @Override
-                            public void accept(ResponseBean<UserBean> data) throws Exception {
-                                showResult(data);
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Log.e("TaskActivity", "onError --> " + throwable);
-                            }
-                        });
-            }
-        });
-        findViewById(R.id.async_task).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AsyncTask<ResponseBean<UserBean>> task = api.asyncUser("王小红", 27);
-                task.asyncExecute(new Task.Callback<ResponseBean<UserBean>>() {
+            public void onSuccess(Task task, final ResponseBean<UserBean> data) {
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void onSuccess(Task task, ResponseBean<UserBean> data) {
+                    public void run() {
                         showResult(data);
                     }
+                });
+            }
+            @Override
+            public void onFailure(Task task, HttpException exception) {
+                Log.e("TaskActivity", "onFailure --> " + exception);
+            }
+        });
+    }
+
+    /**
+     * 使用 RxJava2 执行网络请求
+     * {@link RxJava2Converter} 转换器会将 Task 转换成 RxJava2 对应的类型（{@link Observable}）
+     * 网络请求执行线程为 IO 线程（{@link Schedulers#io()}）
+     * 网络请求结果回调线程为 UI 线程（{@link AndroidSchedulers#mainThread()}）
+     */
+    @SuppressLint("CheckResult")
+    private void rxjava2Request() {
+        Observable<ResponseBean<UserBean>> observable = taskApi.rxUser("李小二", 18);
+        observable.subscribeOn(Schedulers.io()) // 设置网络请求线程为 IO 线程
+                .observeOn(AndroidSchedulers.mainThread()) // 设置请求回调线程为 UI 线程
+                .subscribe(new Consumer<ResponseBean<UserBean>>() {
                     @Override
-                    public void onFailure(Task task, HttpException exception) {
-                        Log.e("TaskActivity", "onFailure --> " + exception);
+                    public void accept(ResponseBean<UserBean> data) throws Exception {
+                        showResult(data);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("TaskActivity", "onError --> " + throwable);
                     }
                 });
+    }
+
+    /**
+     * 使用自定义的 {@link AsyncTaskConverter.AsyncTask} 执行网络请求
+     * {@link AsyncTaskConverter} 转化器会将 Task 转换成 {@link AsyncTaskConverter.AsyncTask}
+     * {@link AsyncTaskConverter.AsyncTask} 使用的是 {@link android.os.AsyncTask} 作为异步策略
+     */
+    private void asyncTaskRequest() {
+        AsyncTask<ResponseBean<UserBean>> task = taskApi.asyncUser("王小红", 27);
+        task.asyncExecute(new Task.Callback<ResponseBean<UserBean>>() {
+            @Override
+            public void onSuccess(Task task, ResponseBean<UserBean> data) {
+                showResult(data);
+            }
+            @Override
+            public void onFailure(Task task, HttpException exception) {
+                Log.e("TaskActivity", "onFailure --> " + exception);
             }
         });
     }

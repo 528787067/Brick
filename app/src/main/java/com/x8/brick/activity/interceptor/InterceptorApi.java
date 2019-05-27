@@ -10,13 +10,13 @@ import com.x8.brick.okhttp3.OkHttp3Task;
 
 import okhttp3.Response;
 
-@Api("http:192.168.31.100:8080/brick/user/")
+@Api("http:192.168.31.100:8080/")
 public interface InterceptorApi {
 
-    @GET("get")
+    @GET("brick/user/get")
     OkHttp3Task<Response> getUser(@Query("name") String name, @Query("age") int age);
 
     @FormUrlEncoded
-    @POST("post")
+    @POST("brick/user/post")
     OkHttp3Task<Response> postUser(@Field("name") String name, @Field("age") int age);
 }

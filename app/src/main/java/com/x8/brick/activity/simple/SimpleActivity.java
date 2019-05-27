@@ -20,6 +20,14 @@ import okhttp3.Response;
 
 public class SimpleActivity extends AppCompatActivity implements View.OnClickListener, Task.Callback<Response> {
 
+    /**
+     * 使用的基本步骤：
+     * 1、定义 API 接口（需要使用 {@link @Api} 注解），在接口中定义请求方法，其他注解使用方法与 Retrofit 完全一致
+     * 2、构造 {@link OkHttp3Client} 对象（可以传入 {@link OkHttpClient} 对象进行网络请求配置）
+     * 3、使用 {@link OkHttp3Client} 构造 {@link OkHttp3Manager}
+     * 4、将定义好的 API 接口传入 {@link OkHttp3Manager#create(Class)} 中生成 API 对象，直接调用该对象的方法即可
+     */
+
     private SimpleApi api;
     private TextView dataView;
 
@@ -34,20 +42,25 @@ public class SimpleActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.post_user).setOnClickListener(this);
         dataView = (TextView) findViewById(R.id.data_show);
 
+        // 1、创建 OkHttpClient 作为进行网络请求配置
         OkHttpClient httpClient = new OkHttpClient.Builder()
-                .readTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS) // 配置读超时时间为 5 秒
+                .writeTimeout(5, TimeUnit.SECONDS) // 配置写超时时间为 5 秒
                 .build();
+        // 2、构造 OkHttp3Client 对象
         OkHttp3Client http3Client = new OkHttp3Client.Builder()
                 .setOkHttpClient(httpClient)
                 .build();
+        // 3、使用 OkHttp3Client 对象构造 OkHttp3Manager 对象
         OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client).build();
+        // 4、使用 OkHttp3Manager 对象创建出 API 接口对象，可直接调用该接口对象定义的方法进行网络请求
         api = http3Manager.create(SimpleApi.class);
     }
 
     @Override
     public void onClick(View view) {
         dataView.setText("数据加载中...");
+        // 执行使用 API 接口对象中定义好的方法进行网络请求
         switch (view.getId()) {
             case R.id.path_user:
                 OkHttp3Task<Response> pathTask = api.pathUser("path");
@@ -66,6 +79,7 @@ public class SimpleActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onSuccess(Task task, final Response response) {
+        // 网络请求成功回调，因为默认回调不在主线程，此处更新 UI 需要发送到 UI 线程进行更新
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

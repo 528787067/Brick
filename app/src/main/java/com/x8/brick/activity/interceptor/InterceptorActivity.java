@@ -24,6 +24,17 @@ import okhttp3.Response;
 
 public class InterceptorActivity extends AppCompatActivity implements View.OnClickListener, Task.Callback<Response> {
 
+    /**
+     * 支持定义多级过滤器和拦截器
+     * 过滤器分请求过滤器和响应过滤器，控制粒度比拦截器要小
+     * 自定义请求过滤器需要实现 {@link RequestFilter} 接口，用于在请求前处理请求参数
+     * 自定义响应过滤器需要实现 {@link ResponseFilter} 接口，用于在响应后处理响应数据
+     * 自定义拦截器需要实现 {@link Interceptor} 接口，用于拦截处理网络请求过程
+     * 过滤器和拦截器都支持多级处理，即上一级处理完成后会交由下一级进行处理，执行顺序如下：
+     * RequestFilter1 --> RequestFilter2 --> Interceptor1(request) --> Interceptor2(request) -->
+     * Interceptor2(response) --> Interceptor1(response) --> ResponseFilter1 --> ResponseFilter2
+     */
+
     private InterceptorApi api;
     private TextView dataView;
 
@@ -76,9 +87,9 @@ public class InterceptorActivity extends AppCompatActivity implements View.OnCli
         };
 
         OkHttp3Client http3Client = new OkHttp3Client.Builder()
-                .addRequestFilter(requestFilter)
-                .addResponseFilter(responseFilter)
-                .addIntercptor(interceptor)
+                .addRequestFilter(requestFilter) // 添加自定义的请求过滤器
+                .addResponseFilter(responseFilter) // 添加自定义响应过滤器
+                .addIntercptor(interceptor) // 添加拦截器
                 .build();
         OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client).build();
         api = http3Manager.create(InterceptorApi.class);

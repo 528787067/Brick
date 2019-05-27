@@ -34,9 +34,10 @@ public class GsonActivity extends AppCompatActivity implements Task.Callback<Res
         age = (TextView) findViewById(R.id.age);
         method = (TextView) findViewById(R.id.method);
 
+        // Gson 转换器可以实现将 Response 数据直接转换成实体对象
         OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
         OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client)
-                .addResponseConverter(new OkHttp3GsonResponseConverter<>())
+                .addResponseConverter(new OkHttp3GsonResponseConverter<>()) // 添加 Gson 转换器
                 .build();
         final GsonApi api = http3Manager.create(GsonApi.class);
 
