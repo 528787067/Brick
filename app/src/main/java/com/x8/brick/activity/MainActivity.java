@@ -13,6 +13,7 @@ import com.x8.brick.activity.interceptor.InterceptorActivity;
 import com.x8.brick.activity.rxjava2.RxJava2Activity;
 import com.x8.brick.activity.simple.SimpleActivity;
 import com.x8.brick.activity.multihost.MultiHostActivity;
+import com.x8.brick.activity.task.TaskActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.gson).setOnClickListener(this);
         findViewById(R.id.converter).setOnClickListener(this);
         findViewById(R.id.rxjava2).setOnClickListener(this);
+        findViewById(R.id.task).setOnClickListener(this);
     }
 
     @Override
@@ -48,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.rxjava2:
                 startActivity(new Intent(this, RxJava2Activity.class));
+                break;
+            case R.id.task:
+                startActivity(new Intent(this, TaskActivity.class));
                 break;
         }
     }

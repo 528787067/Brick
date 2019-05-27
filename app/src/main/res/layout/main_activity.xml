@@ -46,5 +46,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="rxjava2" />
+
+        <Button
+            android:id="@+id/task"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义Task转换器" />
     </LinearLayout>
 </ScrollView>

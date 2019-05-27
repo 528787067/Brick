@@ -22,5 +22,6 @@
         <activity android:name=".activity.gson.GsonActivity"/>
         <activity android:name=".activity.converter.ConverterActivity"/>
         <activity android:name=".activity.rxjava2.RxJava2Activity"/>
+        <activity android:name=".activity.task.TaskActivity"/>
     </application>
 </manifest>
