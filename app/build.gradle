@@ -27,5 +27,6 @@ dependencies {
     implementation project(path: ":brick-task-rxjava2")
     implementation project(path: ":brick-converter-gson")
     implementation project(path: ":brick-executor-async")
+    implementation "io.reactivex.rxjava2:rxandroid:${project.dependVersion.rxandroid2}"
     implementation "com.android.support:appcompat-v7:${project.dependVersion.support_version}"
 }

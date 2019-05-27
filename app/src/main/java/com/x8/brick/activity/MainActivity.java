@@ -10,6 +10,7 @@ import com.x8.brick.R;
 import com.x8.brick.activity.converter.ConverterActivity;
 import com.x8.brick.activity.gson.GsonActivity;
 import com.x8.brick.activity.interceptor.InterceptorActivity;
+import com.x8.brick.activity.rxjava2.RxJava2Activity;
 import com.x8.brick.activity.simple.SimpleActivity;
 import com.x8.brick.activity.multihost.MultiHostActivity;
 
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.interceptor).setOnClickListener(this);
         findViewById(R.id.gson).setOnClickListener(this);
         findViewById(R.id.converter).setOnClickListener(this);
+        findViewById(R.id.rxjava2).setOnClickListener(this);
     }
 
     @Override
@@ -43,6 +45,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.converter:
                 startActivity(new Intent(this, ConverterActivity.class));
+                break;
+            case R.id.rxjava2:
+                startActivity(new Intent(this, RxJava2Activity.class));
                 break;
         }
     }

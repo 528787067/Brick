@@ -40,5 +40,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="自定义类型转换器" />
+
+        <Button
+            android:id="@+id/rxjava2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="rxjava2" />
     </LinearLayout>
 </ScrollView>
