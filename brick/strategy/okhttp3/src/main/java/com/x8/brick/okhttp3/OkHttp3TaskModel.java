@@ -9,8 +9,6 @@ import com.x8.brick.task.TaskModel;
 
 import java.lang.reflect.Type;
 
-import okhttp3.Response;
-
 public class OkHttp3TaskModel extends TaskModel<OkHttp3Request, OkHttp3Response> {
 
     protected OkHttp3TaskModel(
@@ -24,15 +22,15 @@ public class OkHttp3TaskModel extends TaskModel<OkHttp3Request, OkHttp3Response>
         return new OkHttp3RequestGenerator(httpManager());
     }
 
-    @Override
-    public Type responseType() {
-        Type type = super.responseType();
-        if (type == OkHttp3Response.class) {
-            throw new IllegalArgumentException(
-                    "'" + type + "' is not a valid response body type. Did you mean Response?");
-        }
-        return type;
-    }
+//    @Override
+//    public Type responseType() {
+//        Type type = super.responseType();
+//        if (type == OkHttp3Response.class) {
+//            throw new IllegalArgumentException(
+//                    "'" + type + "' is not a valid response body type. Did you mean Response?");
+//        }
+//        return type;
+//    }
 
     @Nullable
     @Override

@@ -34,5 +34,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Gson转换器" />
+
+        <Button
+            android:id="@+id/converter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义类型转换器" />
     </LinearLayout>
 </ScrollView>

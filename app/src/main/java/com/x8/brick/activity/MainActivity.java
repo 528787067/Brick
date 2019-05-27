@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.x8.brick.R;
+import com.x8.brick.activity.converter.ConverterActivity;
 import com.x8.brick.activity.gson.GsonActivity;
 import com.x8.brick.activity.interceptor.InterceptorActivity;
 import com.x8.brick.activity.simple.SimpleActivity;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.multi_host).setOnClickListener(this);
         findViewById(R.id.interceptor).setOnClickListener(this);
         findViewById(R.id.gson).setOnClickListener(this);
+        findViewById(R.id.converter).setOnClickListener(this);
     }
 
     @Override
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.gson:
                 startActivity(new Intent(this, GsonActivity.class));
+                break;
+            case R.id.converter:
+                startActivity(new Intent(this, ConverterActivity.class));
                 break;
         }
     }
