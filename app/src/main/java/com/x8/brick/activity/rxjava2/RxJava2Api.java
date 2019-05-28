@@ -9,12 +9,12 @@ import com.x8.brick.annotation.define.type.Api;
 
 import io.reactivex.Observable;
 
-@Api("http:192.168.31.100:8080/brick/user/")
+@Api("http:192.168.31.100:8080/")
 public interface RxJava2Api {
 
-    @GET("get")
+    @GET("brick/user/get")
     Observable<ResponseBean<UserBean>> getUser(@Query("name") String name, @Query("age") int age);
 
-    @POST("post")
+    @POST("brick/user/post")
     Observable<ResponseBean<UserBean>> postUser(@Query("name") String name, @Query("age") int age);
 }

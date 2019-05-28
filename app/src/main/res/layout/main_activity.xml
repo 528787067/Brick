@@ -52,5 +52,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="自定义Task转换器" />
+
+        <Button
+            android:id="@+id/asset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="使用Asset目录下的数据模拟请求" />
     </LinearLayout>
 </ScrollView>

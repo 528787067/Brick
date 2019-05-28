@@ -3,33 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
     android:orientation="vertical"
+    android:layout_margin="20dp"
     tools:ignore="HardcodedText">
 
     <Button
-        android:id="@+id/get_data"
+        android:id="@+id/get_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Get 请求" />
+        android:text="GET 请求" />
 
     <Button
-        android:id="@+id/get_data_bean"
+        android:id="@+id/post_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Gson 转换器" />
-
-    <Button
-        android:id="@+id/get_data_string"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="String 转换器" />
+        android:text="POST 请求" />
 
     <TextView
         android:id="@+id/data_show"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="20dp"
-        android:text="数据展示"/>
-
+        android:text="数据展示" />
 </LinearLayout>

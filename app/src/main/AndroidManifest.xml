@@ -23,5 +23,6 @@
         <activity android:name=".activity.converter.ConverterActivity"/>
         <activity android:name=".activity.rxjava2.RxJava2Activity"/>
         <activity android:name=".activity.task.TaskActivity"/>
+        <activity android:name=".activity.asset.AssetActivity"/>
     </application>
 </manifest>

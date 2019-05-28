@@ -18,7 +18,6 @@ import com.x8.brick.task.rxjava2.RxJava2Converter;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -37,13 +36,6 @@ public class RxJava2Activity extends AppCompatActivity implements View.OnClickLi
         setTitle("RxJava2转换器");
         setContentView(R.layout.rxjava2_activity);
 
-        OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
-        OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client)
-                .addResponseConverter(new OkHttp3GsonResponseConverter<>())
-                .addTaskConverter(new RxJava2Converter())
-                .build();
-        api = http3Manager.create(RxJava2Api.class);
-
         findViewById(R.id.get_user).setOnClickListener(this);
         findViewById(R.id.post_user).setOnClickListener(this);
 
@@ -51,44 +43,74 @@ public class RxJava2Activity extends AppCompatActivity implements View.OnClickLi
         name = (TextView) findViewById(R.id.name);
         age = (TextView) findViewById(R.id.age);
         method = (TextView) findViewById(R.id.method);
+
+        OkHttp3Client http3Client = new OkHttp3Client.Builder().build();
+        OkHttp3Manager http3Manager = new OkHttp3Manager.Builder(http3Client)
+                .addResponseConverter(new OkHttp3GsonResponseConverter<>()) // 添加 Gson 转化器，将响应对象转换成实体对象
+                .addTaskConverter(new RxJava2Converter()) // 添加 RxJava2 转换器，将 task 转换成 Observable
+                .build();
+        api = http3Manager.create(RxJava2Api.class);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.get_user:
-                Observable<ResponseBean<UserBean>> getObservable = api.getUser("王二狗", 22);
-                Disposable getDisposable = getObservable.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<ResponseBean<UserBean>>() {
-                            @Override
-                            public void accept(ResponseBean<UserBean> data) throws Exception {
-                                showResult(data);
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Log.e("RxJava2Activity", "onError --> " + throwable);
-                            }
-                        });
+                getUser();
                 break;
             case R.id.post_user:
-                Observable<ResponseBean<UserBean>> postObservable = api.postUser("王小华", 18);
-                Disposable postDisposable = postObservable.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<ResponseBean<UserBean>>() {
-                            @Override
-                            public void accept(ResponseBean<UserBean> data) throws Exception {
-                                showResult(data);
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Log.e("RxJava2Activity", "onError --> " + throwable);
-                            }
-                        });
+                postUser();
                 break;
         }
+    }
+
+    /**
+     * 使用 RxJava2 执行 get 请求
+     * {@link RxJava2Converter} 转换器会将 Task 转换成 RxJava2 对应的类型（{@link Observable}）
+     * 网络请求执行线程为 IO 线程（{@link Schedulers#io()}）
+     * 网络请求结果回调线程为 UI 线程（{@link AndroidSchedulers#mainThread()}）
+     */
+    @SuppressLint("CheckResult")
+    private void getUser() {
+        Observable<ResponseBean<UserBean>> getObservable = api.getUser("王二狗", 22);
+        getObservable.subscribeOn(Schedulers.io()) // 设置网络请求线程为 IO 线程
+                .observeOn(AndroidSchedulers.mainThread()) // 设置请求回调线程为 UI 线程
+                .subscribe(new Consumer<ResponseBean<UserBean>>() {
+                    @Override
+                    public void accept(ResponseBean<UserBean> data) throws Exception {
+                        showResult(data);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("RxJava2Activity", "onError --> " + throwable);
+                    }
+                });
+    }
+
+
+    /**
+     * 使用 RxJava2 执行 post 请求
+     * {@link RxJava2Converter} 转换器会将 Task 转换成 RxJava2 对应的类型（{@link Observable}）
+     * 网络请求执行线程为 IO 线程（{@link Schedulers#io()}）
+     * 网络请求结果回调线程为 UI 线程（{@link AndroidSchedulers#mainThread()}）
+     */
+    @SuppressLint("CheckResult")
+    private void postUser() {
+        Observable<ResponseBean<UserBean>> postObservable = api.postUser("王小华", 18);
+        postObservable.subscribeOn(Schedulers.io()) // 设置网络请求线程为 IO 线程
+                .observeOn(AndroidSchedulers.mainThread()) // 设置请求回调线程为 UI 线程
+                .subscribe(new Consumer<ResponseBean<UserBean>>() {
+                    @Override
+                    public void accept(ResponseBean<UserBean> data) throws Exception {
+                        showResult(data);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("RxJava2Activity", "onError --> " + throwable);
+                    }
+                });
     }
 
     @SuppressLint("SetTextI18n")

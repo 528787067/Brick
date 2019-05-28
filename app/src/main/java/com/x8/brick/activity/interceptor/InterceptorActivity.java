@@ -116,7 +116,8 @@ public class InterceptorActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void run() {
                 try {
-                    dataView.setText(response.body().string());
+                    String data = response.body().string();
+                    dataView.setText(data);
                 } catch (Exception e) {
                     dataView.setText(e.toString());
                 } finally {

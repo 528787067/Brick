@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.x8.brick.R;
+import com.x8.brick.activity.asset.AssetActivity;
 import com.x8.brick.activity.converter.ConverterActivity;
 import com.x8.brick.activity.gson.GsonActivity;
 import com.x8.brick.activity.interceptor.InterceptorActivity;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.converter).setOnClickListener(this);
         findViewById(R.id.rxjava2).setOnClickListener(this);
         findViewById(R.id.task).setOnClickListener(this);
+        findViewById(R.id.asset).setOnClickListener(this);
     }
 
     @Override
@@ -53,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.task:
                 startActivity(new Intent(this, TaskActivity.class));
+                break;
+            case R.id.asset:
+                startActivity(new Intent(this, AssetActivity.class));
                 break;
         }
     }

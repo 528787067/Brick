@@ -13,7 +13,7 @@ import com.x8.brick.parameter.Response;
 public abstract class AsyncTaskExecutor<REQUEST extends Request, RESPONSE extends Response, RESULT>
         implements Executor<REQUEST, RESPONSE, RESULT> {
 
-    private volatile ExecutorAsyncTask executorAsyncTask;
+    private volatile ExecutorAsyncTask<REQUEST, RESPONSE, RESULT> executorAsyncTask;
 
     @Override
     public void asyncExecute(REQUEST request, Callback<REQUEST, RESPONSE, RESULT> callback) {
@@ -42,11 +42,11 @@ public abstract class AsyncTaskExecutor<REQUEST extends Request, RESPONSE extend
     private static class ExecutorAsyncTask<REQUEST extends Request, RESPONSE extends Response, RESULT>
             extends AsyncTask<REQUEST, Void, RESULT> {
 
-        private Executor<REQUEST, RESPONSE, ?> executor;
+        private Executor<REQUEST, RESPONSE, RESULT> executor;
         private Callback<REQUEST, RESPONSE, RESULT> callback;
         private HttpException exception;
 
-        ExecutorAsyncTask(@NonNull Executor<REQUEST, RESPONSE, ?> executor,
+        ExecutorAsyncTask(@NonNull Executor<REQUEST, RESPONSE, RESULT> executor,
                 @Nullable Callback<REQUEST, RESPONSE, RESULT> callback) {
             this.executor = executor;
             this.callback = callback;
