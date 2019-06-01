@@ -73,10 +73,10 @@ public abstract class OkHttp3FileExecutor<T> implements Executor<OkHttp3Request,
         List<String> paths = httpUrl.pathSegments();
         if (paths != null) {
             for (int i = 0; i < paths.size(); i++) {
-                pathBuilder.append(paths.get(i));
-                if (i < paths.size() - 1) {
+                if (pathBuilder.length() > 0) {
                     pathBuilder.append(File.separator);
                 }
+                pathBuilder.append(paths.get(i));
             }
         }
         InputStream inputStream = null;
@@ -104,12 +104,14 @@ public abstract class OkHttp3FileExecutor<T> implements Executor<OkHttp3Request,
             }
             String result = resultBuilder.toString();
             ResponseBody body = ResponseBody.create(mediaType, result);
-            Response response = responseBuilder.body(body).code(200).message("OK").build();
+            Response response = responseBuilder.body(body).code(200).message("success").build();
             return new OkHttp3Response(response);
         } catch (FileNotFoundException e) {
-            return new OkHttp3Response(responseBuilder.code(404).message(e.toString()).build());
+            ResponseBody body = ResponseBody.create(mediaType, e.toString());
+            return new OkHttp3Response(responseBuilder.code(404).message(e.getMessage()).body(body).build());
         } catch (IOException e) {
-            return new OkHttp3Response(responseBuilder.code(500).message(e.toString()).build());
+            ResponseBody body = ResponseBody.create(mediaType, e.toString());
+            return new OkHttp3Response(responseBuilder.code(500).message(e.getMessage()).body(body).build());
         } catch (Exception e) {
             throw new HttpException(e);
         } finally {

@@ -9,6 +9,7 @@ import android.view.View;
 import com.x8.brick.R;
 import com.x8.brick.activity.asset.AssetActivity;
 import com.x8.brick.activity.converter.ConverterActivity;
+import com.x8.brick.activity.executor.ExecutorActivity;
 import com.x8.brick.activity.gson.GsonActivity;
 import com.x8.brick.activity.interceptor.InterceptorActivity;
 import com.x8.brick.activity.rxjava2.RxJava2Activity;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.rxjava2).setOnClickListener(this);
         findViewById(R.id.task).setOnClickListener(this);
         findViewById(R.id.asset).setOnClickListener(this);
+        findViewById(R.id.executor).setOnClickListener(this);
     }
 
     @Override
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.asset:
                 startActivity(new Intent(this, AssetActivity.class));
+                break;
+            case R.id.executor:
+                startActivity(new Intent(this, ExecutorActivity.class));
                 break;
         }
     }

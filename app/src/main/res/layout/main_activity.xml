@@ -58,5 +58,53 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="使用Asset目录下的数据模拟请求" />
+
+        <Button
+            android:id="@+id/executor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义执行器" />
+
+        <Button
+            android:id="@+id/filter_paramter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="过滤器/拦截器添加公共参数" />
+
+        <Button
+            android:id="@+id/task_model_paramter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TaskModel添加公共参数" />
+
+        <Button
+            android:id="@+id/md5_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Header MD5校验" />
+
+        <Button
+            android:id="@+id/aes_paramter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="参数AES加密" />
+
+        <Button
+            android:id="@+id/annotation_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义注解-类型转换器" />
+
+        <Button
+            android:id="@+id/annotation_executor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义注解-执行器" />
+
+        <Button
+            android:id="@+id/strategy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义策略" />
     </LinearLayout>
 </ScrollView>

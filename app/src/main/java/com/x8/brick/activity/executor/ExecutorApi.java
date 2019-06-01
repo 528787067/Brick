@@ -1,4 +1,4 @@
-package com.x8.brick.activity.asset;
+package com.x8.brick.activity.executor;
 
 import com.x8.brick.annotation.define.method.FormUrlEncoded;
 import com.x8.brick.annotation.define.method.GET;
@@ -11,7 +11,7 @@ import com.x8.brick.okhttp3.OkHttp3Task;
 import okhttp3.Response;
 
 @Api("http:192.168.31.100:8080/")
-public interface AssetApi {
+public interface ExecutorApi {
 
     @GET("brick/user/get")
     OkHttp3Task<Response> getUser(@Query("name") String name, @Query("age") int age);

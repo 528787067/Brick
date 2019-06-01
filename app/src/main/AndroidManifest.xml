@@ -24,5 +24,6 @@
         <activity android:name=".activity.rxjava2.RxJava2Activity"/>
         <activity android:name=".activity.task.TaskActivity"/>
         <activity android:name=".activity.asset.AssetActivity"/>
+        <activity android:name=".activity.executor.ExecutorActivity"/>
     </application>
 </manifest>

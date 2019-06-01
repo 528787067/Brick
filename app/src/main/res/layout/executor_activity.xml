@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText">
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:id="@+id/okhttp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:checked="true"
+            android:text="OkHttp网络请求" />
+        <RadioButton
+            android:id="@+id/asset"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Asset文件模拟"/>
+        <RadioButton
+            android:id="@+id/file"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="本地文件模拟"/>
+        <RadioButton
+            android:id="@+id/string"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="直接返回字符串模拟"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/get_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="GET 请求"/>
+
+    <Button
+        android:id="@+id/post_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="POST 请求"/>
+
+    <TextView
+        android:id="@+id/data_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:text="数据展示"/>
+
+</LinearLayout>

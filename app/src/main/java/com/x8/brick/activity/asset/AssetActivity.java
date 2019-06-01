@@ -33,6 +33,12 @@ public class AssetActivity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.post_user).setOnClickListener(this);
         dataView = (TextView) findViewById(R.id.data_show);
 
+        /*
+         * 添加 asset 模拟执行器工厂，可以读取 asset 目录下的文件来模拟网络请求
+         * OkHttp3AssetAsyncTaskExecutorFactory 执行器工厂使用 OkHttp3AssetAsyncTaskExecutor 执行器进行处理
+         * OkHttp3AssetAsyncTaskExecutor 执行器会根据请求的 URL 的相对地址读取 asset 目录下的对应文件来模拟网络请求
+         * OkHttp3AssetAsyncTaskExecutor 执行器使用的是 AsyncTask 进行异步处理，因此可以直接回调到主线程
+         */
         OkHttp3Client http3Client = new OkHttp3Client.Builder()
                 .setExecutorFacotry(new OkHttp3AssetAsyncTaskExecutorFactory(this))
                 .build();
@@ -52,11 +58,17 @@ public class AssetActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    /**
+     * 使用 asset/brick/user/get 文件模拟 http:192.168.31.100:8080/brick/user/get 接口
+     */
     private void getUser() {
         OkHttp3Task<Response> task = api.getUser("李小二", 17);
         task.asyncExecute(this);
     }
 
+    /**
+     * 使用 asset/brick/user/post 文件模拟 http:192.168.31.100:8080/brick/user/post 接口
+     */
     private void postUser() {
         OkHttp3Task<Response> task = api.postUser("王大锤", 23);
         task.asyncExecute(this);
