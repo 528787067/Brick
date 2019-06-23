@@ -557,12 +557,28 @@ public class RequestModel {
 
     public static class Host {
 
-        public final String name;
-        public final String url;
+        private String name;
+        private String url;
 
         public Host(String name, String url) {
             this.name = name;
             this.url = url;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String url() {
+            return url;
         }
 
         @Override
@@ -576,14 +592,38 @@ public class RequestModel {
 
     public static class MethodPath {
 
-        public final String method;
-        public final String path;
-        public final boolean hasBody;
+        private String method;
+        private String path;
+        private boolean hasBody;
 
         public MethodPath(@NonNull @HttpMethod String method, String path, boolean hasBody) {
             this.method = method;
             this.path = path;
             this.hasBody = hasBody;
+        }
+
+        public void setMethod(String method) {
+            this.method = method;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public void setHasBody(boolean hasBody) {
+            this.hasBody = hasBody;
+        }
+
+        public String method() {
+            return method;
+        }
+
+        public String path() {
+            return path;
+        }
+
+        public boolean hasBody() {
+            return hasBody;
         }
 
         @Override
@@ -598,14 +638,38 @@ public class RequestModel {
 
     public static class Path {
 
-        public final String name;
-        public final String value;
-        public final boolean encoded;
+        private String name;
+        private String value;
+        private boolean encoded;
 
         public Path(String name, String value, boolean encoded) {
             this.name = name;
             this.value = value;
             this.encoded = encoded;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public void setEncoded(boolean encoded) {
+            this.encoded = encoded;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        public boolean encoded() {
+            return encoded;
         }
 
         @Override
@@ -620,14 +684,38 @@ public class RequestModel {
 
     public static class Query {
 
-        public final String name;
-        public final String value;
-        public final boolean encoded;
+        private String name;
+        private String value;
+        private boolean encoded;
 
         public Query(String name, String value, boolean encoded) {
             this.name = name;
             this.value = value;
             this.encoded = encoded;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public void setEncoded(boolean encoded) {
+            this.encoded = encoded;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        public boolean encoded() {
+            return encoded;
         }
 
         @Override
@@ -642,14 +730,38 @@ public class RequestModel {
 
     public static class Field {
 
-        public final String name;
-        public final String value;
-        public final boolean encoded;
+        private String name;
+        private String value;
+        private boolean encoded;
 
         public Field(String name, String value, boolean encoded) {
             this.name = name;
             this.value = value;
             this.encoded = encoded;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public void setEncoded(boolean encoded) {
+            this.encoded = encoded;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        public boolean encoded() {
+            return encoded;
         }
 
         @Override
@@ -664,12 +776,28 @@ public class RequestModel {
 
     public static class Header {
 
-        public final String name;
-        public final String value;
+        private String name;
+        private String value;
 
         public Header(String name, String value) {
             this.name = name;
             this.value = value;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String value() {
+            return value;
         }
 
         @Override
@@ -683,12 +811,28 @@ public class RequestModel {
 
     public static class QueryName {
 
-        public final String value;
-        public final boolean encoded;
+        private String value;
+        private boolean encoded;
 
         public QueryName(String value, boolean encoded) {
             this.value = value;
             this.encoded = encoded;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public void setEncoded(boolean encoded) {
+            this.encoded = encoded;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        public boolean encoded() {
+            return encoded;
         }
 
         @Override
@@ -702,14 +846,38 @@ public class RequestModel {
 
     public static class Part {
 
-        public final String name;
-        public final String encoding;
-        public final Object data;
+        private String name;
+        private String encoding;
+        private Object data;
 
         public Part(String name, String encoding, Object data) {
             this.name = name;
             this.encoding = encoding;
             this.data = data;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setEncoding(String encoding) {
+            this.encoding = encoding;
+        }
+
+        public void setData(Object data) {
+            this.data = data;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String encoding() {
+            return encoding;
+        }
+
+        public Object data() {
+            return data;
         }
 
         @Override

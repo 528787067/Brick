@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         android:allowBackup="false">
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.VIEW" />
@@ -16,14 +16,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.simple.SimpleActivity"/>
-        <activity android:name=".activity.multihost.MultiHostActivity"/>
-        <activity android:name=".activity.interceptor.InterceptorActivity"/>
-        <activity android:name=".activity.gson.GsonActivity"/>
-        <activity android:name=".activity.converter.ConverterActivity"/>
-        <activity android:name=".activity.rxjava2.RxJava2Activity"/>
-        <activity android:name=".activity.task.TaskActivity"/>
-        <activity android:name=".activity.asset.AssetActivity"/>
-        <activity android:name=".activity.executor.ExecutorActivity"/>
+        <activity android:name=".simple.SimpleActivity"/>
+        <activity android:name=".multihost.MultiHostActivity"/>
+        <activity android:name=".interceptor.InterceptorActivity"/>
+        <activity android:name=".gson.GsonActivity"/>
+        <activity android:name=".converter.ConverterActivity"/>
+        <activity android:name=".rxjava2.RxJava2Activity"/>
+        <activity android:name=".task.TaskActivity"/>
+        <activity android:name=".asset.AssetActivity"/>
+        <activity android:name=".executor.ExecutorActivity"/>
     </application>
 </manifest>

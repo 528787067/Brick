@@ -3,7 +3,7 @@ package com.x8.brick.core;
 import android.support.annotation.NonNull;
 
 import com.x8.brick.executor.Executor;
-import com.x8.brick.executor.ExecutorFacotry;
+import com.x8.brick.executor.ExecutorFactory;
 import com.x8.brick.filter.RequestFilter;
 import com.x8.brick.filter.ResponseFilter;
 import com.x8.brick.interceptor.Interceptor;
@@ -19,8 +19,8 @@ import java.util.List;
 
 public class HttpClient<REQUEST extends Request, RESPONSE extends Response> {
 
-    private ExecutorFacotry<REQUEST, RESPONSE> executorFacotry;
-    private TaskFactory<REQUEST, RESPONSE> taskFactory;
+    private ExecutorFactory<REQUEST, RESPONSE, ?> executorFactory;
+    private TaskFactory<REQUEST, RESPONSE, ?> taskFactory;
     private TaskModelFactory<REQUEST, RESPONSE> taskModelFactory;
     private List<Interceptor<REQUEST, RESPONSE>> interceptors;
     private List<RequestFilter<REQUEST>> requestFilters;
@@ -29,12 +29,13 @@ public class HttpClient<REQUEST extends Request, RESPONSE extends Response> {
     protected HttpClient() {
     }
 
-    protected HttpClient(@NonNull ExecutorFacotry<REQUEST, RESPONSE> executorFacotry) {
-        this.executorFacotry = executorFacotry;
+    protected HttpClient(@NonNull ExecutorFactory<REQUEST, RESPONSE, ?> executorFactory) {
+        this.executorFactory = executorFactory;
     }
 
     public <RESULT> Executor<REQUEST, RESPONSE, RESULT> excutor(@NonNull TaskModel<REQUEST, RESPONSE> taskModel) {
-        return executorFacotry.create(taskModel);
+        // noinspection unchecked
+        return (Executor<REQUEST, RESPONSE, RESULT>) executorFactory.create(taskModel);
     }
 
     public List<Interceptor<REQUEST, RESPONSE>> interceptors() {
@@ -49,23 +50,25 @@ public class HttpClient<REQUEST extends Request, RESPONSE extends Response> {
         return responseFilters;
     }
 
-    public ExecutorFacotry<REQUEST, RESPONSE> executorFacotry() {
-        return executorFacotry;
+    public <RESULT> ExecutorFactory<REQUEST, RESPONSE, RESULT> executorFactory() {
+        // noinspection unchecked
+        return (ExecutorFactory<REQUEST, RESPONSE, RESULT>) executorFactory;
     }
 
-    public TaskFactory<REQUEST, RESPONSE> taskFactory() {
-        return taskFactory;
+    public <RESULT> TaskFactory<REQUEST, RESPONSE, RESULT> taskFactory() {
+        // noinspection unchecked
+        return (TaskFactory<REQUEST, RESPONSE, RESULT>) taskFactory;
     }
 
     public TaskModelFactory<REQUEST, RESPONSE> taskModelFactory() {
         return taskModelFactory;
     }
 
-    protected void setExecutorFacotry(@NonNull ExecutorFacotry<REQUEST, RESPONSE> executorFacotry) {
-        this.executorFacotry = executorFacotry;
+    protected void setExecutorFactory(@NonNull ExecutorFactory<REQUEST, RESPONSE, ?> executorFactory) {
+        this.executorFactory = executorFactory;
     }
 
-    protected void setTaskFactory(@NonNull TaskFactory<REQUEST, RESPONSE> taskFactory) {
+    protected void setTaskFactory(@NonNull TaskFactory<REQUEST, RESPONSE, ?> taskFactory) {
         this.taskFactory = taskFactory;
     }
 
@@ -104,9 +107,9 @@ public class HttpClient<REQUEST extends Request, RESPONSE extends Response> {
             this.httpClient = createHttpClient();
         }
 
-        public Builder(@NonNull ExecutorFacotry<REQUEST, RESPONSE> executorFacotry) {
+        public Builder(@NonNull ExecutorFactory<REQUEST, RESPONSE, ?> executorFactory) {
             this();
-            setExecutorFacotry(executorFacotry);
+            setExecutorFactory(executorFactory);
         }
 
         protected CLIENT createHttpClient() {
@@ -123,12 +126,12 @@ public class HttpClient<REQUEST extends Request, RESPONSE extends Response> {
             return this.httpClient;
         }
 
-        public BUILDER setExecutorFacotry(@NonNull ExecutorFacotry<REQUEST, RESPONSE> executorFacotry) {
-            httpClient.setExecutorFacotry(executorFacotry);
+        public BUILDER setExecutorFactory(@NonNull ExecutorFactory<REQUEST, RESPONSE, ?> executorFactory) {
+            httpClient.setExecutorFactory(executorFactory);
             return builder();
         }
 
-        public BUILDER setTaskFactory(@NonNull TaskFactory<REQUEST, RESPONSE> taskFactory) {
+        public BUILDER setTaskFactory(@NonNull TaskFactory<REQUEST, RESPONSE, ?> taskFactory) {
             httpClient.setTaskFactory(taskFactory);
             return builder();
         }
@@ -154,11 +157,12 @@ public class HttpClient<REQUEST extends Request, RESPONSE extends Response> {
         }
 
         public CLIENT build() {
-            if (httpClient.executorFacotry() == null) {
-                throw new IllegalArgumentException("You should first set up an ExecutorFacotry");
+            if (httpClient.executorFactory() == null) {
+                throw new IllegalArgumentException("You should first set up an ExecutorFactory");
             }
             if (httpClient.taskFactory() == null) {
-                setTaskFactory(new HttpTaskFactory<REQUEST, RESPONSE>());
+                HttpTaskFactory<REQUEST, RESPONSE, ?> taskFactory = new HttpTaskFactory<>();
+                setTaskFactory(taskFactory);
             }
             return httpClient;
         }

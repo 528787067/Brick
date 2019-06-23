@@ -11,6 +11,10 @@ import java.util.List;
 
 public final class AnnotationUtils {
 
+    private AnnotationUtils() {
+        throw new UnsupportedOperationException("u can't instantiate me...");
+    }
+
     public static boolean hasTypeAnnotation(Method method) {
         return hasTargetAnnotation(method, ElementType.TYPE);
     }

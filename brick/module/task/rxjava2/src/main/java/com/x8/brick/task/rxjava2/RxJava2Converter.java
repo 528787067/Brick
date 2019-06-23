@@ -48,7 +48,7 @@ public class RxJava2Converter implements TaskConverter<Task<? extends Request, ?
             return null;
         }
         Observable<?> observable = isAsync
-                ? new RxJava2TaskAsyncObservable<>(task) : new RxJava2TaskExecuteObservable<>(task);
+                ? new TaskAsyncObservable<>(task) : new TaskExecuteObservable<>(task);
         if (scheduler != null) {
             observable = observable.subscribeOn(scheduler);
         }

@@ -46,7 +46,7 @@ public class RxJavaConverter implements TaskConverter<Task<? extends Request, ? 
             return null;
         }
         OnSubscribe<?> onSubscribe = isAsync
-                ? new RxJavaTaskAsyncOnSubscribe<>(task) : new RxJavaTaskExecuteOnSubscribe<>(task);
+                ? new TaskAsyncOnSubscribe<>(task) : new TaskExecuteOnSubscribe<>(task);
         Observable<?> observable = Observable.create(onSubscribe);
         if (scheduler != null) {
             observable = observable.subscribeOn(scheduler);

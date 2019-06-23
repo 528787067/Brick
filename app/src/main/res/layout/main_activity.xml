@@ -105,6 +105,6 @@
             android:id="@+id/strategy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="自定义策略" />
+            android:text="自定义网络策略" />
     </LinearLayout>
 </ScrollView>

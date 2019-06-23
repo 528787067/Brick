@@ -21,6 +21,7 @@ public class GsonRequestConverter<OBJECT, REQUEST> implements RequestConverter<O
         this(gson, new Converter<String, REQUEST>() {
             @Override
             public REQUEST convert(String value, Type type) {
+                // noinspection unchecked
                 return (REQUEST) value;
             }
         });

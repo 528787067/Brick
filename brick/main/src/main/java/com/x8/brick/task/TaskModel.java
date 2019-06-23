@@ -62,28 +62,22 @@ public abstract class TaskModel<REQUEST extends Request, RESPONSE extends Respon
 
     public synchronized REQUEST request() {
         if (request == null) {
-            RequestAdapter requestAdapter = httpManager.requestAdapter();
+            // noinspection unchecked
+            RequestAdapter<Object, ?> requestAdapter = httpManager.requestAdapter();
             if (requestModel != null && requestAdapter != null) {
-                List<?> requestBodys = requestModel.bodys();
-                if (requestBodys.size() > 0) {
-                    List<?> bodys = new ArrayList<>(requestBodys);
-                    requestBodys.clear();
+                if (requestModel.hasBody()) {
+                    List<?> bodys = new ArrayList<>(requestModel.bodys());
+                    requestModel.clearBodys();
                     for (Object body : bodys) {
-                        Type bodyType = body.getClass();
-                        // noinspection unchecked
-                        Object requestBody = requestAdapter.adapt(body, bodyType);
-                        requestModel.addBody(requestBody);
+                        Type type = body.getClass();
+                        requestModel.addBody(requestAdapter.adapt(body, type));
                     }
                 }
-                List<RequestModel.Part> parts = requestModel.parts();
-                if (parts.size() > 0) {
-                    List<RequestModel.Part> partDatas = new ArrayList<>(parts);
-                    parts.clear();
-                    for (RequestModel.Part partData : partDatas) {
-                        Type partDataType = partData.getClass();
-                        // noinspection unchecked
-                        Object part = requestAdapter.adapt(partData.data, partDataType);
-                        requestModel.addPart(partData.name, partData.encoding, part);
+                if (requestModel.hasPart()) {
+                    for (RequestModel.Part part : requestModel.parts()) {
+                        Object data = part.data();
+                        Type type = data.getClass();
+                        part.setData(requestAdapter.adapt(data, type));
                     }
                 }
             }
@@ -91,12 +85,12 @@ public abstract class TaskModel<REQUEST extends Request, RESPONSE extends Respon
             if (requestModelChecker != null) {
                 requestModel = requestModelChecker.checkRequestModel(requestModel);
             }
-            RequestGenerator<REQUEST> requestGenerator = requestGenerator();
+            RequestGenerator<REQUEST, RESPONSE> requestGenerator = requestGenerator();
             // noinspection ConstantConditions
             if (requestGenerator == null) {
                 throw new IllegalArgumentException("RequestGenerator cannot to be null.");
             }
-            request = requestGenerator.generateRequest(requestModel);
+            request = requestGenerator.generateRequest(httpManager, requestModel);
         }
         return request;
     }
@@ -137,13 +131,13 @@ public abstract class TaskModel<REQUEST extends Request, RESPONSE extends Respon
     }
 
     @NonNull
-    protected abstract RequestGenerator<REQUEST> requestGenerator();
+    protected abstract RequestGenerator<REQUEST, RESPONSE> requestGenerator();
 
     public interface RequestModelChecker {
         RequestModel checkRequestModel(RequestModel requestModel);
     }
 
-    public interface RequestGenerator<REQUEST extends Request> {
-        REQUEST generateRequest(RequestModel requestModel);
+    public interface RequestGenerator<REQUEST extends Request, RESPONSE extends Response> {
+        REQUEST generateRequest(HttpManager<REQUEST, RESPONSE> httpManager, RequestModel requestModel);
     }
 }

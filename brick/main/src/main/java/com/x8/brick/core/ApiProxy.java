@@ -3,11 +3,7 @@ package com.x8.brick.core;
 import android.support.annotation.NonNull;
 
 import com.x8.brick.annotation.checker.Checker;
-import com.x8.brick.annotation.handler.AnnotationHandlerHelper;
-import com.x8.brick.annotation.handler.AnnotationHandlerHelper.MethodModel;
-import com.x8.brick.annotation.handler.MethodAnnotationHandlerDelegate;
-import com.x8.brick.annotation.handler.ParameterAnnotationHandlerDelegate;
-import com.x8.brick.annotation.handler.TypeAnnotationHandlerDelegate;
+import com.x8.brick.annotation.handler.HandlerHelper;
 import com.x8.brick.parameter.Request;
 import com.x8.brick.parameter.Response;
 import com.x8.brick.task.Task;
@@ -28,13 +24,15 @@ import java.util.concurrent.ConcurrentHashMap;
 class ApiProxy<API, REQUEST extends Request, RESPONSE extends Response> implements InvocationHandler {
 
     private HttpManager<REQUEST, RESPONSE> httpManager;
-    private TaskFactory<REQUEST, RESPONSE> taskFactory;
+    private TaskFactory<REQUEST, RESPONSE, ?> taskFactory;
+    private HandlerHelper handlerHelper;
 
     private volatile RequestModel typeRequestModelCache;
     private volatile Map<Method, RequestModel> methodRequestModelCache;
 
     ApiProxy(@NonNull HttpManager<REQUEST, RESPONSE> httpManager) {
         this.httpManager = httpManager;
+        this.handlerHelper = new HandlerHelper(this.httpManager);
         this.taskFactory = this.httpManager.httpClient().taskFactory();
     }
 
@@ -73,8 +71,8 @@ class ApiProxy<API, REQUEST extends Request, RESPONSE extends Response> implemen
             } else {
                 boolean checkEffective = checkAnnotationEffective();
                 List<Checker> checkers = httpManager.annotationCheckers();
-                if (typeRequestModelCache == null && (!checkEffective
-                        || AnnotationUtils.hasTypeAnnotation(method, checkers))) {
+                if (typeRequestModelCache == null
+                        && (!checkEffective || AnnotationUtils.hasTypeAnnotation(method, checkers))) {
                     synchronized (this) {
                         if (typeRequestModelCache == null) {
                             typeRequestModelCache = parseTypeAnnotation(methodModel, new RequestModel());
@@ -106,21 +104,14 @@ class ApiProxy<API, REQUEST extends Request, RESPONSE extends Response> implemen
     }
 
     private RequestModel parseTypeAnnotation(MethodModel methodModel, RequestModel requestModel) {
+        Method method = methodModel.method();
         boolean checkEffective = checkAnnotationEffective();
         List<Checker> checkers = httpManager.annotationCheckers();
-        if (!checkEffective || AnnotationUtils.hasTypeAnnotation(methodModel.method, checkers)) {
-            Annotation[] typeAnnotations = methodModel.method.getDeclaringClass().getAnnotations();
-            TypeAnnotationHandlerDelegate delegate = httpManager.typeAnnotationHandlerDelegate();
-            boolean cacheAble = httpManager.handlerCacheAble();
-            AnnotationHandlerHelper handlerHelper = AnnotationHandlerHelper.getInstance();
+        if (!checkEffective || AnnotationUtils.hasTypeAnnotation(method, checkers)) {
+            Annotation[] typeAnnotations = method.getDeclaringClass().getAnnotations();
             for (Annotation annotation : typeAnnotations) {
                 if (!checkEffective || AnnotationUtils.isTypeAnnotation(annotation, checkers)) {
-                    if (delegate != null) {
-                        requestModel = delegate.handleAnnotation(methodModel, annotation, requestModel, cacheAble);
-                    } else {
-                        requestModel = handlerHelper.handleDefaultTypeAnnotation(
-                                methodModel, annotation, requestModel, cacheAble);
-                    }
+                    requestModel = handlerHelper.handleTypeAnnotation(annotation, requestModel, methodModel);
                 }
             }
         }
@@ -128,21 +119,14 @@ class ApiProxy<API, REQUEST extends Request, RESPONSE extends Response> implemen
     }
 
     private RequestModel parseMethodAnnotation(MethodModel methodModel, RequestModel requestModel) {
+        Method method = methodModel.method();
         boolean checkEffective = checkAnnotationEffective();
         List<Checker> checkers = httpManager.annotationCheckers();
-        if (!checkEffective || AnnotationUtils.hasMethodAnnotation(methodModel.method, checkers)) {
-            Annotation[] methodAnnotations = methodModel.method.getAnnotations();
-            MethodAnnotationHandlerDelegate delegate = httpManager.methodAnnotationHandlerDelegate();
-            boolean cacheAble = httpManager.handlerCacheAble();
-            AnnotationHandlerHelper handlerHelper = AnnotationHandlerHelper.getInstance();
+        if (!checkEffective || AnnotationUtils.hasMethodAnnotation(method, checkers)) {
+            Annotation[] methodAnnotations = method.getAnnotations();
             for (Annotation annotation : methodAnnotations) {
                 if (!checkEffective || AnnotationUtils.isMethodAnnotation(annotation, checkers)) {
-                    if (delegate != null) {
-                        requestModel = delegate.handleAnnotation(methodModel, annotation, requestModel, cacheAble);
-                    } else {
-                        requestModel = handlerHelper.handleDefaultMethodAnnotation(
-                                methodModel, annotation, requestModel, cacheAble);
-                    }
+                    requestModel = handlerHelper.handleMethodAnnotation(annotation, requestModel, methodModel);
                 }
             }
         }
@@ -150,26 +134,19 @@ class ApiProxy<API, REQUEST extends Request, RESPONSE extends Response> implemen
     }
 
     private RequestModel parseParameterAnnotation(MethodModel methodModel, RequestModel requestModel) {
+        Method method = methodModel.method();
+        Object[] parameters = methodModel.parameters();
         boolean checkEffective = checkAnnotationEffective();
         List<Checker> checkers = httpManager.annotationCheckers();
-        if (methodModel.parameters != null && (!checkEffective
-                || AnnotationUtils.hasParameterAnnotation(methodModel.method, checkers))) {
-            Annotation[][] parameterAnnotationsArray = methodModel.method.getParameterAnnotations();
-            ParameterAnnotationHandlerDelegate delegate = httpManager.parameterAnnotationHandlerDelegate();
-            boolean cacheAble = httpManager.handlerCacheAble();
-            AnnotationHandlerHelper handlerHelper = AnnotationHandlerHelper.getInstance();
-            for (int i = 0; i < methodModel.parameters.length; i++) {
-                Object parameter = methodModel.parameters[i];
+        if (parameters != null && (!checkEffective || AnnotationUtils.hasParameterAnnotation(method, checkers))) {
+            Annotation[][] parameterAnnotationsArray = method.getParameterAnnotations();
+            for (int i = 0; i < parameters.length; i++) {
+                Object parameter = parameters[i];
                 Annotation[] parameterAnnotations = parameterAnnotationsArray[i];
                 for (Annotation annotation : parameterAnnotations) {
                     if (!checkEffective || AnnotationUtils.isParameterAnnotation(annotation, checkers)) {
-                        if (delegate != null) {
-                            requestModel = delegate.handleAnnotation(
-                                    methodModel, annotation, parameter, requestModel, cacheAble);
-                        } else {
-                            requestModel = handlerHelper.handleDefaultParameterAnnotation(
-                                    methodModel, annotation, parameter, requestModel, cacheAble);
-                        }
+                        requestModel = handlerHelper.handleParameterAnnotation(
+                                annotation, parameter, requestModel, methodModel);
                     }
                 }
             }
@@ -190,7 +167,8 @@ class ApiProxy<API, REQUEST extends Request, RESPONSE extends Response> implemen
             throw new IllegalArgumentException("You must first set up an TaskModelFactory.");
         }
         TaskModel<REQUEST, RESPONSE> taskModel = taskModelFactory.create(httpManager, requestModel, taskType);
-        return taskFactory.create(taskModel);
+        // noinspection unchecked
+        return (Task<REQUEST, RESPONSE, RESULT>) taskFactory.create(taskModel);
     }
 
     private <RESULT> Object convertTask(Task<REQUEST, RESPONSE, RESULT> task, Type taskType) {

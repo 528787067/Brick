@@ -11,9 +11,12 @@ import com.x8.brick.adapter.TaskConverterAdapter;
 import com.x8.brick.annotation.checker.AnnotationChecker;
 import com.x8.brick.annotation.checker.Checker;
 import com.x8.brick.annotation.define.type.Api;
-import com.x8.brick.annotation.handler.MethodAnnotationHandlerDelegate;
-import com.x8.brick.annotation.handler.ParameterAnnotationHandlerDelegate;
-import com.x8.brick.annotation.handler.TypeAnnotationHandlerDelegate;
+import com.x8.brick.annotation.handler.HttpMethodHandlerFactory;
+import com.x8.brick.annotation.handler.HttpParameterHandlerFactory;
+import com.x8.brick.annotation.handler.HttpTypeHandlerFactory;
+import com.x8.brick.annotation.handler.MethodHandlerFactory;
+import com.x8.brick.annotation.handler.ParameterHandlerFactory;
+import com.x8.brick.annotation.handler.TypeHandlerFactory;
 import com.x8.brick.converter.RequestConverter;
 import com.x8.brick.converter.ResponseConverter;
 import com.x8.brick.converter.TaskConverter;
@@ -40,9 +43,9 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
     private boolean parseResultCacheAble;
     private boolean validateEagerly;
     private boolean checkAnnotationEffective;
-    private TypeAnnotationHandlerDelegate typeAnnotationHandlerDelegate;
-    private MethodAnnotationHandlerDelegate methodAnnotationHandlerDelegate;
-    private ParameterAnnotationHandlerDelegate parameterAnnotationHandlerDelegate;
+    private List<TypeHandlerFactory> typeHandlerFactories;
+    private List<MethodHandlerFactory> methodHandlerFactories;
+    private List<ParameterHandlerFactory> parameterHandlerFactories;
 
     protected HttpManager(@NonNull HttpClient<REQUEST, RESPONSE> httpClient) {
         this.httpClient = httpClient;
@@ -85,8 +88,8 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
     public String url(String hostName) {
         if (hostName != null && hosts != null) {
             for (RequestModel.Host host : hosts) {
-                if (host.name.equals(hostName)) {
-                    return host.url;
+                if (host.name().equals(hostName)) {
+                    return host.url();
                 }
             }
         }
@@ -141,16 +144,16 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
         return checkAnnotationEffective;
     }
 
-    public TypeAnnotationHandlerDelegate typeAnnotationHandlerDelegate() {
-        return typeAnnotationHandlerDelegate;
+    public List<TypeHandlerFactory> typeHandlerFactories() {
+        return typeHandlerFactories;
     }
 
-    public MethodAnnotationHandlerDelegate methodAnnotationHandlerDelegate() {
-        return methodAnnotationHandlerDelegate;
+    public List<MethodHandlerFactory> methodHandlerFactories() {
+        return methodHandlerFactories;
     }
 
-    public ParameterAnnotationHandlerDelegate parameterAnnotationHandlerDelegate() {
-        return parameterAnnotationHandlerDelegate;
+    public List<ParameterHandlerFactory> parameterHandlerFactories() {
+        return parameterHandlerFactories;
     }
 
     public void setHost(String host) {
@@ -170,7 +173,7 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
             hosts = new LinkedList<>();
         }
         for (RequestModel.Host host : hosts) {
-            if (host.name.equals(name)) {
+            if (host.name().equals(name)) {
                 hosts.remove(host);
                 break;
             }
@@ -234,16 +237,25 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
         this.checkAnnotationEffective = checkAnnotationEffective;
     }
 
-    protected void setTypeAnnotationHandlerDelegate(TypeAnnotationHandlerDelegate delegate) {
-        this.typeAnnotationHandlerDelegate = delegate;
+    protected void addTypeHandlerFactory(@NonNull TypeHandlerFactory typeHandlerFactory) {
+        if (typeHandlerFactories == null) {
+            typeHandlerFactories = new LinkedList<>();
+        }
+        typeHandlerFactories.add(typeHandlerFactory);
     }
 
-    protected void setMethodAnnotationHandlerDelegate(MethodAnnotationHandlerDelegate delegate) {
-        this.methodAnnotationHandlerDelegate = delegate;
+    protected void addMethodHandlerFactory(@NonNull MethodHandlerFactory methodHandlerFactory) {
+        if (methodHandlerFactories == null) {
+            methodHandlerFactories = new LinkedList<>();
+        }
+        methodHandlerFactories.add(methodHandlerFactory);
     }
 
-    protected void setParameterAnnotationHandlerDelegate(ParameterAnnotationHandlerDelegate delegate) {
-        this.parameterAnnotationHandlerDelegate = delegate;
+    protected void addParameterHandlerFactory(@NonNull ParameterHandlerFactory parameterHandlerFactory) {
+        if (parameterHandlerFactories == null) {
+            parameterHandlerFactories = new LinkedList<>();
+        }
+        parameterHandlerFactories.add(parameterHandlerFactory);
     }
 
     public static class Builder<REQUEST extends Request, RESPONSE extends Response,
@@ -291,7 +303,7 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
         }
 
         public BUILDER addHost(@NonNull RequestModel.Host host) {
-            return addHost(host.name, host.url);
+            return addHost(host.name(), host.url());
         }
 
         public BUILDER addHosts(RequestModel.Host... hosts) {
@@ -354,21 +366,21 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
             httpManager.setCheckAnnotationEffective(checkAnnotationEffective);
             return builder();
         }
-
-        public BUILDER setTypeAnnotationHandlerDelegate(TypeAnnotationHandlerDelegate delegate) {
-            httpManager.setTypeAnnotationHandlerDelegate(delegate);
+        public BUILDER addTypeHandlerFactory(@NonNull TypeHandlerFactory typeHandlerFactory) {
+            httpManager.addTypeHandlerFactory(typeHandlerFactory);
             return builder();
         }
 
-        public BUILDER setMethodAnnotationHandlerDelegate(MethodAnnotationHandlerDelegate delegate) {
-            httpManager.setMethodAnnotationHandlerDelegate(delegate);
+        public BUILDER addMethodHandlerFactory(@NonNull MethodHandlerFactory methodHandlerFactory) {
+            httpManager.addMethodHandlerFactory(methodHandlerFactory);
             return builder();
         }
 
-        public BUILDER setParameterAnnotationHandlerDelegate(ParameterAnnotationHandlerDelegate delegate) {
-            httpManager.setParameterAnnotationHandlerDelegate(delegate);
+        public BUILDER addParameterHandlerFactory(@NonNull ParameterHandlerFactory parameterHandlerFactory) {
+            httpManager.addParameterHandlerFactory(parameterHandlerFactory);
             return builder();
         }
+
 
         public MANAGER build() {
             MANAGER httpManager = httpManager();
@@ -376,6 +388,9 @@ public class HttpManager<REQUEST extends Request, RESPONSE extends Response> {
                 throw new IllegalArgumentException("HttpClient is not allowed to be null");
             }
             httpManager.addAnnotationChecker(new AnnotationChecker());
+            httpManager.addTypeHandlerFactory(new HttpTypeHandlerFactory());
+            httpManager.addMethodHandlerFactory(new HttpMethodHandlerFactory());
+            httpManager.addParameterHandlerFactory(new HttpParameterHandlerFactory());
             // noinspection unchecked
             httpManager.setTaskAdapter(new TaskConverterAdapter(httpManager.taskConverters()));
             // noinspection unchecked
